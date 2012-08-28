@@ -1,0 +1,8 @@
+<!-- START_HIGHLIGHT -->
+<%= render @cart %>
+<!-- END_HIGHLIGHT -->
+
+<!-- START_HIGHLIGHT -->
+<%= button_to 'Empty cart', @cart, :method => :delete,
+              :confirm => 'Are you sure?' %>
+<!-- END_HIGHLIGHT -->

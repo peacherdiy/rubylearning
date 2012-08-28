@@ -1,0 +1,146 @@
+1 : 创建产品 数据
+<br/>rails g scaffold product title:string description:text image_url:string
+<p>
+  <p style="color: #ff0000;"> 生成下面的列表: </p>
+  invoke  active_record<br/>
+  create    db/migrate/20120815145105_create_products.rb<br/>
+  create    app/models/product.rb                <br/>
+  invoke    test_unit                       <br/>
+  create      test/unit/product_test.rb   <br/>
+  create      test/fixtures/products.yml <br/>
+  route  resources :products             <br/>
+  invoke  scaffold_controller              <br/>
+  create    app/controllers/products_controller.rb  <br/>
+  invoke    erb                                  <br/>
+  create      app/views/products                  <br/>
+  create      app/views/products/index.html.erb     <br/>
+  create      app/views/products/edit.html.erb      <br/>
+  create      app/views/products/show.html.erb        <br/>
+  create      app/views/products/new.html.erb           <br/>
+  create      app/views/products/_form.html.erb             <br/>
+  invoke    test_unit                                        <br/>
+  create      test/functional/products_controller_test.rb     <br/>
+  invoke    helper                                         <br/>
+  create      app/helpers/products_helper.rb                <br/>
+  invoke      test_unit                                     <br/>
+  create        test/unit/helpers/products_helper_test.rb    <br/>
+  invoke  assets                                              <br/>
+  invoke    coffee                                            <br/>
+  create      app/assets/javascripts/products.js.coffee      <br/>
+  invoke    scss                                             <br/>
+  create      app/assets/stylesheets/products.css.scss        <br/>
+  invoke  scss                                                <br/>
+  identical    app/assets/stylesheets/scaffolds.css.scss     <br/>
+</p>
+
+<p style="color: #ff0000;">2 (database migration) 資料庫遷移檔: </p>
+<br/>bundle exec rake db:migrate
+
+<p>
+  ==  CreateProducts: migrating =================================================  <br/>
+  -- create_table(:products)                                                <br/>
+  -> 0.0540s                                                                     <br/>
+  ==  CreateProducts: migrated (0.0550s) ========================================  <br/>
+</p>
+
+
+<p style="color: #ff0000;">3 OK了，<a href="/products" target="_blank">看一看</a> 新应用 吧: </p>
+
+<p style="color: #ff0000;">4 我们的货品没有定价, 纳入版本控制的增加一列: </p>
+<br/>rails g migration add_price_to_product price:decimal
+
+<p>
+  invoke  active_record                                       <br/>
+  create    db/migrate/20120815151332_add_price_to_product.rb       <br/>
+</p>
+
+
+<p style="color: #ff0000;">5 应用我们的变更到数据库: </p>
+<br/>bundle exec rake db:migrate
+
+<p>
+  ==  AddPriceToProduct: migrating ==============================================     <br/>
+  -- add_column(:products, :price, :decimal)                                         <br/>
+  -> 0.0020s                                                                          <br/>
+  ==  AddPriceToProduct: migrated (0.0030s) =====================================       <br/>
+</p>
+<a href="/products" style="color: #ff0000;" target="_blank">再看一看</a>
+
+
+<p style="color: #ff0000;">6 准备测试数据: </p>
+<br/>rails g migration add_product_test_data
+
+<p>
+  invoke  active_record        <br/>
+  create    db/migrate/20120816001401_add_product_test_data.rb  <br/>
+</p>
+
+<p style="color: #ff0000;">7 应用测试数据: </p>
+<br/>bundle exec rake db:migrate
+
+<p>
+  由于有中文会显示下面的错误提示: <br/>
+  rake aborted!                <br/>
+  E:/dev/language/ruby/ROR/newWorkspace/workspace/db/migrate/20120816001401_add_product_test_data.rb:17: invalid multibyte         <br/>
+  char (US-ASCII)                                                                                                           <br/>
+  E:/dev/language/ruby/ROR/newWorkspace/workspace/db/migrate/20120816001401_add_product_test_data.rb:17: invalid multibyte     <br/>
+  char (US-ASCII)                                                                                                                   <br/>
+  E:/dev/language/ruby/ROR/newWorkspace/workspace/db/migrate/20120816001401_add_product_test_data.rb:17: syntax error, une               <br/>
+  xpected $end, expecting ')'                                                                                                                 <br/>
+  Product.create(:title => '姝ｈ兘閲?,                                                                                                             <br/>
+  ^                                           <br/>
+  <br/>
+  Tasks: TOP => db:migrate                <br/>
+  (See full trace by running task with --trace)   <br/>
+</p>
+
+<p>
+ 暂时不处理，先把中文 注释吧，再执行  <br/>
+  ==  AddProductTestData: migrating =============================================    <br/>
+  ==  AddProductTestData: migrated (0.6170s) ====================================      <br/>
+</p>
+<a href="/products" style="color: #ff0000;" target="_blank">可复用的测试数据准备好咯</a>
+
+                                                              <br/>
+
+<p>
+    <a href="#" style="color: #ff0000;" target="_blank">8:修改测试数据怎么办呢？</a>
+</p>
+
+<p>
+    <a href="#" style="color: #ff0000;" target="_blank">9:添加商品分类</a>  <br/>
+
+
+  rails g controller store index  <br/>
+  <a href="/store/index" style="color: #ff0000;" target="_blank">访问 http://localhost:3000/store</a>  <br/>
+</p>
+
+<p style="color: #ff0000;">10 保持我们的session到数据库: </p>
+<br/>rake db:sessions:create
+
+<p>
+  invoke  active_record    <br/>
+  create    db/migrate/20120820135525_add_sessions_table.rb         <br/>
+
+</p>
+
+<p style="color: #ff0000;">11 知会rails: ????????????</p>
+<br/>
+然后，我们要告诉 Rails 把 session 数据保存在数据库中 (因为默认的是将所有东西都保存在
+
+cookie中)。这是一个配置选项，所以毫不意外地，应该在 config 目录下的某个文件中去配置
+
+<p>
+  invoke  active_record    <br/>
+  create    db/migrate/20120820135525_add_sessions_table.rb         <br/>
+
+</p>
+
+<p style="color: #ff0000;">12 创建购物车</p>
+<br/>
+rails  generate   scaffold   cart      <br/>
+rails   generate   scaffold   line_item   product_id:integer       cart_id:integer 购物项   <br/>
+<p>
+
+
+</p>

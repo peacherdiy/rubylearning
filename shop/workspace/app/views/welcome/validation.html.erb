@@ -1,0 +1,8 @@
+
+错误,照葫芦画瓢,<br/>
+protected<br/>
+def validates_length_of<br/>
+errors.add(:title, 'should be at least 10' ) if title.nil? || title.length >= 10<br/>
+end<br/>
+正确：<br/>
+validates :title, :length => {:minimum => 10}

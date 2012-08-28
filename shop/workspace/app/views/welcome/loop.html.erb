@@ -1,0 +1,28 @@
+<h1>loop example</h1>     <p><%= link_to "返回", welcome_index_path %></p>
+1 <span style="font-weight: bolder;">code:</span>
+<code>
+  <br/>&lt;% 3.times do-%&gt;<br/>
+    loop type 1              <br/>
+  &lt;% end %&gt;          <br/>
+</code>
+<p>
+  <span style="font-weight: bolder;">result:</span>     <br/>
+  <% 3.times do%>
+      ho!<br/>
+  <% end %>
+  merry christmas
+</p>
+
+
+2 <span style="font-weight: bolder;">code:</span>
+<code>
+  <br/>&lt;% 3.downto(1) do |count| -%&gt;<br/>
+  loop type 1              <br/>
+  &lt;% end %&gt;          <br/>
+</code>
+<p>
+  <span style="font-weight: bolder;">result:</span>     <br/>
+  <% 3.downto(1) do |count|-%>
+      loop type <%=count%>     <br/>
+  <% end -%>
+</p>
