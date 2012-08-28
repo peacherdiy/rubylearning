@@ -1,0 +1,103 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | Rails 範例專案</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/example.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <p>本章的目的是讓讀者可以從一個完整的<em>Rails</em>專案中學習：</p>
+
+<h2 id='job_board'>Job Board</h2>
+
+<p><em><a href='http://jobs.ruby.tw'>Ruby Jobs in Taiwan</a></em>是一個簡單的<em>Job Board</em>系統，原始碼開放在<em><a href='https://github.com/rubytaiwan/jobs.ruby.tw'>Github</a></em>上，功能包括：</p>
+
+<ol>
+<li>使用者註冊、登入、登出。使用<em>Devise gem</em> 2. 使用者可以張貼工作，並設定工作的張貼期限 3. 使用者可以編輯、下架、刪除自己張接的工作</li>
+</ol>
+
+<p>功能雖然簡單，但是包含了<em>Model spec</em>、<em>Controler spec</em>和<em>Acceptence Test</em>可供學習。</p>
+
+<h2 id='id18'>簡易論壇系統</h2>
+
+<ul>
+<li>開發一個簡易論壇系統。系統要有 Forum 與 Post 兩個 model，寫出 CRUD 介面，並且文章網址是使用 http://forum.local/forums/1/posts/2 這種表示。</li>
+
+<li>使用 web-app-theme 套版</li>
+
+<li>使用者必須能夠 註冊 / 登入，登入後才可以發表 Post，不然只能瀏覽。只有自己的 Post 才能進行修改與刪除。請使用 devise gem。</li>
+
+<li>論壇的文章要能夠分頁，每一頁 20 筆，每一個論壇要秀出現在論壇裡有多少文章數量。請使用 kaminari gem。</li>
+
+<li>可依照文章時間排序，請使用 Model 的 scope 功能。</li>
+
+<li>每篇文章可以上傳附件。請使用 paperclip gem。</li>
+
+<li>建立一個後台，讓管理員可以刪改所有文章，網址是 http://forum.local/admin/。只有身分是 admin 的人可以進後台。admin 的判別方是 column 裡加一個 boolean，判斷是否 admin。這個 attribute 必須用 attr_accessible 或 attr_protected 保護。</li>
+
+<li>用 Rake 撰寫的產生假資料的步驟。執行 rake dev:fake 即會產生假文章與假論壇。</li>
+</ul>
+
+<p>(TODO) 提供解答在 GitHub 上</p>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

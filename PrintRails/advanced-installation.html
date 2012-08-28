@@ -1,0 +1,282 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | Rails 進階開發環境</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/advanced-installation.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='rails'><em>Rails</em>進階開發環境</h2>
+<div id='submenu'>
+<h3>本章目錄</h3>
+<ul>
+<li>Mac OS X</li>
+<li>Windows</li>
+<li>Ubuntu</li>
+</ul>
+</div>
+<p>本書在<a href='installation.html'>第二章</a>介紹了如何快速安裝，本附錄將介紹進階的安裝方式，例如<em>RVM</em>和<em>MySQL</em>。適合專業的開發者。</p>
+
+<h3 id='mac_os_x'>Mac OS X</h3>
+
+<h4 id='mysql'>安裝<em>MySQL</em></h4>
+
+<p><em>Mac OS</em>除了可以至<em>MySQL</em>官網下載，筆者推薦透過<em>Homebrew</em>安裝：</p>
+
+<pre><code>$ brew install mysql
+$ unset TMPDIR
+$ mysql_install_db --verbose --user=`root` --basedir=&quot;$(brew --prefix mysql)&quot;
+$ mysql.server start
+$ mysqladmin -u root password &#39;newpassword&#39;</code></pre>
+
+<p>如果需要開機就把<em>MySQL</em>開起來的話：</p>
+
+<pre><code>$ mkdir -p ~/Library/LaunchAgents
+$ cp /usr/local/Cellar/mysql/5.5.19/com.mysql.mysqld.plist ~/Library/LaunchAgents/
+$ launchctl load -w ~/Library/LaunchAgents/com.mysql.mysqld.plist</code></pre>
+
+<p>安裝<em>MySQL Adapter</em>：</p>
+
+<pre><code>$ gem install mysql2</code></pre>
+
+<p>修改<em>Gemfile</em>加上：</p>
+
+<pre><code>gem &#39;mysql2&#39;</code></pre>
+
+<blockquote>
+<p>如果你是<em>Rails 3.0</em>的使用者，必須指定<code>gem &#39;mysql2&#39;, &#39;~&gt;0.2.7&#39;</code>的版本。</p>
+</blockquote>
+
+<p>修改<em>config/database.yml</em>設定檔，例如：</p>
+
+<pre><code>development:
+  adapter: mysql2
+  encoding: utf8
+  database: demo_development
+  host: localhost
+  username: root
+  password:
+
+test:
+  adapter: mysql2
+  encoding: utf8
+  database: demo_test
+  host: localhost
+  username: root
+  password:
+  
+production:
+  adapter: mysql2
+  encoding: utf8
+  database: demo_production
+  host: localhost
+  username: root
+  password:</code></pre>
+
+<h4 id='rvmruby'>使用<em>RVM</em>安裝<em>Ruby</em></h4>
+
+<p><em><a href='http://rvm.beginrescueend.com/'>RVM</a>(Ruby Version Manager)</em>是一套可以同時安裝不同版本<em>Ruby</em>的工具，你可以安裝<em>REE</em>、<em>1.8.7</em>、<em>1.9.3</em>、<em>JRuby</em>甚至是開發中的最新<em>Ruby</em>。</p>
+
+<p>安裝<em>RVM</em>前需要先裝有<em>Git</em>版本控制系統(請參考附錄介紹<em>Git</em>)：</p>
+
+<pre><code>$ brew install git
+$ brew install readline
+$ brew link readline</code></pre>
+
+<p>接著安裝<em>RVM</em>：</p>
+
+<pre><code>$ bash &lt; &lt;(curl -s https://rvm.beginrescueend.com/install/rvm)
+$ echo &#39;[[ -s &quot;$HOME/.rvm/scripts/rvm&quot; ]] &amp;&amp; . &quot;$HOME/.rvm/scripts/rvm&quot; &gt;&gt; ~/.bash_profile
+$ source ~/.bash_profile</code></pre>
+
+<p>接著看你想要安裝哪一個<em>Ruby</em>版本，例如筆者推薦<em>Ruby 1.9.3</em>：</p>
+
+<pre><code>$ rvm install 1.9.3
+$ rvm 1.9.3 --default</code></pre>
+
+<blockquote>
+<p>XCode 4.2 必須用<code>rvm install 1.9.3 --with-gcc=clang</code></p>
+</blockquote>
+
+<p>你也可以試著安裝其他版本，輸入<code>rvm list known</code>會列出有哪些版本可以安裝，例如：</p>
+
+<pre><code>$ rvm install ree --with-readline-dir=/usr/local</code></pre>
+
+<blockquote>
+<p>Xcode 4.2 必須先執行 <code>export CC=/usr/bin/gcc-4.2</code></p>
+</blockquote>
+
+<p>這樣就會安裝<em><a href='http://www.rubyenterpriseedition.com/'>REE</a></em>版本，輸入<code>rvm ree</code>切換到<em>REE</em>版的<em>Ruby</em>，輸入<code>rvm list</code>會列出目前已經安裝的版本。輸入<code>ruby -v</code>可以得知目前的<em>Ruby</em>版本：</p>
+
+<pre><code>$ rvm 1.9.3
+$ ruby -v
+ruby 1.9.3p0 (2011-10-30 revision 33570) [x86_64-darwin11.2.0]
+$ rvm ree
+$ ruby -v
+ruby 1.8.7 (2011-12-28 MBARI 8/0x6770 on patchlevel 357) [i686-darwin11.3.0], MBARI 0x6770, Ruby Enterprise Edition 2012.01</code></pre>
+
+<p>如果有輸入<code>rvm 1.9.3 --default</code>設定了<em>1.9.3</em>是預設的<em>Ruby</em>版本，但是有專案需要跑特定版本如<em>REE</em>，你可以在專案目錄下放一個檔案叫做<code>.rvmrc</code>，內容是：</p>
+
+<pre><code>rvm ree</code></pre>
+
+<p>這樣進到這個目錄的時候，就會自動切換到<em>REE</em>版本。</p>
+
+<h3 id='windows'>Windows</h3>
+
+<p>如果不使用<em><a href='http://railsinstaller.org/'>Rails Installer</a></em>的話，你可以選擇拆開來安裝：</p>
+
+<h4 id='mysql'>MySQL</h4>
+
+<p>至<em><a href='http://www.mysql.com/'>MySQL</a></em>官網下載安裝。</p>
+
+<p>安裝<em>MySQL Adapter</em>：</p>
+
+<pre><code>$ gem install mysql</code></pre>
+
+<p>修改<em>Gemfile</em>加上：</p>
+
+<pre><code>gem &#39;mysql&#39;</code></pre>
+
+<p>修改<em>config/database.yml</em>設定檔。</p>
+
+<p>Windows 7 x64 的使用者，請參考：</p>
+
+<ul>
+<li>https://github.com/oneclick/rubyinstaller/wiki/Troubleshooting#wiki-gems_mix_bits</li>
+
+<li>http://blog.mmediasys.com/2011/07/07/installing-mysql-on-windows-7-x64-and-using-ruby-with-it/</li>
+
+<li>http://paul-wong-jr.blogspot.com/2011/06/getting-mysql2-gem-to-work-with-ruby-on.html</li>
+</ul>
+
+<h4 id='sqlite3'>SQLite3</h4>
+
+<p>至<em><a href='http://www.sqlite.org/'>SQLite</a></em>官網下載<em>DLL of the SQLite library</em>檔案放到<code>C:\Windows</code>目錄下。</p>
+
+<p>安裝<em>SQLite Adapter</em>：</p>
+
+<pre><code>$ gem install sqlite3</code></pre>
+
+<h4 id='rubyinstallerruby'>使用<em>RubyInstaller</em>安裝<em>Ruby</em></h4>
+
+<p>請至<em><a href='http://rubyinstaller.org/'>RubyInstaller</a></em>下載<em>Ruby 1.9.2</em>安裝包，安裝過程中請點選將<em>Ruby</em>加入可執行的路徑<em>(Add Ruby executables to your PATH)</em>。</p>
+
+<p>另外，有一些<em>RubyGems</em>套件會需要編譯動作，也請下載<em>Development Kit</em>解壓縮後放到<code>C:\Ruby192\</code>下，包括兩個步驟</p>
+
+<ol>
+<li>建立<code>C:\Ruby192\devkit</code></li>
+
+<li>複製<code>bin</code>目錄下的檔案至<code>C:\Ruby192\bin</code>下。</li>
+</ol>
+
+<blockquote>
+<p>使用<em>Git</em>版本控制系統請參閱附錄。</p>
+</blockquote>
+
+<h4 id='pikruby'>使用<em>pik</em>安裝<em>Ruby</em></h4>
+
+<p><em><a href='https://github.com/vertiginous/pik'>pik</a></em>是一套類似的<em>RVM</em>的工具，可以同時安裝不同版本的<em>Ruby</em>。</p>
+
+<h4 id='id1'>使用虛擬機器</h4>
+
+<p>不過，如第二章所說跑在<em>Windows</em>上有一些缺點，例如碰到一些需要的套件沒有支援<em>Windows</em>。另一種在<em>Windows</em>上開發的方式是透過虛擬機器<em>(Virtual Machine)</em>，例如用<em><a href='http://www.virtualbox.org/'>VirtualBox</a></em>來跑<em><a href='http://www.ubuntu.com/desktop'>Ubuntu Desktop Edition</a></em>，或是使用<em><a href='http://www.cygwin.com/'>Cygwin</a></em>來提供<em>Unix-like</em>環境。</p>
+
+<h3 id='ubuntu_desktop'>Ubuntu Desktop</h3>
+
+<h4 id='mysql'>安裝<em>MySQL</em></h4>
+
+<p><em>Ubuntu</em>上安裝<em>MySQL</em>請執行：</p>
+
+<pre><code>$ sudo apt-get install mysql-server mysql-common mysql-client libmysqlclient-dev</code></pre>
+
+<p>安裝<em>MySQL Adapter</em>：</p>
+
+<pre><code>$ gem install mysql2</code></pre>
+
+<p>修改<em>Gemfile</em>加上：</p>
+
+<pre><code>gem &#39;mysql2&#39;</code></pre>
+
+<blockquote>
+<p>如果你是<em>Rails 3.0</em>的使用者，必須指定<code>gem &#39;mysql2&#39;, &#39;~&gt;0.2.7&#39;</code>的版本。</p>
+</blockquote>
+
+<p>修改<em>config/database.yml</em>設定檔。</p>
+
+<h4 id='rvmruby'>使用<em>RVM</em>安裝<em>Ruby</em></h4>
+
+<p>在使用<em>RVM</em>之前必須先安裝以下套件：</p>
+
+<pre><code>$ sudo apt-get install build-essential libssl-dev libpcre3-dev libncurses5-dev libreadline6-dev</code></pre>
+
+<p><em><a href='http://rvm.beginrescueend.com/'>RVM</a>(Ruby Version Manager)</em>請參考上一節的內容。記得也是要先裝有<em>Git</em>，請參考附錄<em>Git</em>如何安裝。</p>
+
+<p>如果碰到<em>Linux</em>套件問題，請參考<em><a href='http://beginrescueend.com/packages/'>RVM Packages</a></em>有一些常見解法。</p>
+
+<h3 id='id2'>更多線上資源</h3>
+
+<ul>
+<li><a href='http://blog.eddie.com.tw/2011/04/08/rvm-and-gemsets/'>RVM and Gemsets</a></li>
+</ul>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

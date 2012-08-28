@@ -1,0 +1,143 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | Rails 疑難雜症</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/rails-recipes.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='rails_'>Rails 疑難雜症</h2>
+<div id='submenu'>
+<h3>本章目錄</h3>
+<ul>
+<li>升級</li>
+<li>Rake</li>
+<li>如何變更 ActiveRecord 預設的資料表和主鍵名稱</li>
+</ul>
+</div>
+<p>這一章集結了一些常見的<em>Rails</em>疑難雜症問題。</p>
+
+<h3 id='rails'>升級<em>Rails</em></h3>
+
+<p>小版號的升級，通常透過以下步驟即可完成：</p>
+
+<ul>
+<li>修改<code>Gemfile</code>的<em>Rails</em>版本： <code>gem &#39;rails&#39;, &#39;3.1.1&#39;</code></li>
+
+<li>執行<code>bundle update</code></li>
+
+<li>執行<code>rake rails:update</code> 會嘗試更新<em>Rails</em>自己產生的檔案，例如<em>config/boot.rb</em>，請一一手動檢查。</li>
+</ul>
+
+<p>升級前，也請參閱官方公告的升級注意事項。</p>
+
+<h3 id='rake'>Rake</h3>
+
+<p>http://erik.debill.org/2011/12/04/rake-for-rails-developers</p>
+
+<p><a href='http://rake.rubyforge.org/'>Rake</a> 是一套類似 Make 的 Builder 工具，讓我們可以撰寫一些腳本任務，並且很方便設定各個任務的相依性。在 Rails 之中就內建了許多 rake 指令，除了你已經使用過的 rake db:migrate 之外，還有例如：</p>
+
+<pre><code>rake db:migrate
+rake db:drop
+rake tmp:clear
+rake notes</code></pre>
+
+<p>你可以輸入 rake -T 看到所有的 rake 指令。而要在 Rails 環境中撰寫 Rake，請將附檔名為 .rake 的檔案放在 lib/tasks 目錄下即可，例如：</p>
+
+<p>/lib/tasks/dev.rake</p>
+
+<pre><code># encoding: utf-8
+namespace :dev do
+
+  desc &quot;Rebuild system&quot;
+  task :build =&gt; [&quot;tmp:clear&quot;, &quot;log:clear&quot;, &quot;db:drop&quot;, &quot;db:create&quot;, &quot;db:migrate&quot;, :setup ]
+
+  desc &quot;Setup system data&quot;
+  task :setup =&gt; :environment do
+      puts &quot;Create system user&quot;
+      u = User.new( :login =&gt; &quot;root&quot;, :password =&gt; &quot;password&quot;, :email =&gt; &quot;root@example.com&quot;, :name =&gt; &quot;管理員&quot;)
+      u.is_admin = true
+      u.save!
+  end
+end</code></pre>
+
+<p>透過執行 rake dev:build，就會自動清除 log 檔案，砍掉資料庫，執行 migrate，然後執行 rake dev:setup 建立一個使用者。</p>
+
+<p>更多介紹可以參考 <a href='http://codequietly.com/2010/6/rake-tasks-101'>http://codequietly.com/2010/6/rake-tasks-101</a> 和 <a href='http://jasonseifer.com/2010/04/06/rake-tutorial'>http://jasonseifer.com/2010/04/06/rake-tutorial</a> 兩篇文章。</p>
+
+<p>如果您有週期性的任務需要執行，也可以透過<em>crontab</em>設定去執行<em>rake</em>腳本。例如輸入<em>crontab -e</em>加入：</p>
+
+<pre><code>0 2 * * * cd /home/your_project/current/ &amp;&amp; RAILS_ENV=production /usr/local/bin/rake cron:daily</code></pre>
+
+<p>就是每天凌晨兩點執行<em>rake cron:daily</em>這個任務。</p>
+
+<h3 id='_activerecord_'>如何變更 ActiveRecord 預設的資料表和主鍵名稱</h3>
+
+<p>有時候你的資料表名稱和主鍵名稱不一定就是 Rails 預設的慣例，也就是表格名稱不是<em>Model</em>名稱的複數型，主鍵不叫<em>id</em>。這時候我們可以手動設定過，例如以下 Model 預設的資料表和主鍵是<em>legacy_comments</em>和<em>id</em>，但是我們想要改成<em>comment</em>和<em>comment_id</em>：</p>
+
+<pre><code>class LegacyComment &lt; ActeveRecord::Base
+    set_table_name :comment
+    set_primary_key :comment_id
+end</code></pre>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

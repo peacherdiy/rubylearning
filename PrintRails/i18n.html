@@ -1,0 +1,227 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | I18n 多國語系</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/i18n.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='i18n_internationalization_'>I18n (Internationalization) 多國語系</h2>
+<div id='submenu'>
+<h3>本章目錄</h3>
+<ul>
+<li>建立翻譯詞彙檔</li>
+<li>使用方法</li>
+<li>如何讓使用者可以切換多語系</li>
+<li>時區 TimeZone</li>
+<li>Unicode 處理</li>
+</ul>
+</div>
+<h3 id='id144'>建立翻譯詞彙檔</h3>
+
+<p>要讓你的網站可以支援多國語系，首先必須定義出需要翻譯的詞彙。這些詞彙檔放在 config/locales 下，使用 yml 格式。Rails 預設的語系是英文，如果要換成中文，請這樣做：</p>
+
+<ul>
+<li>
+<p>下載 zh-TW.yml <a href='https://github.com/svenfuchs/rails-i18n/blob/master/rails/locale/zh-TW.yml'>http://github.com/svenfuchs/rails-i18n</a> 到 config/locale/ 下，就有預設的 Rails 繁體中文翻譯</p>
+</li>
+
+<li>
+<p>修改 config/application.rb 的預設語系</p>
+
+<pre><code>  config.i18n.default_locale = &quot;zh-TW&quot;</code></pre>
+</li>
+</ul>
+
+<h3 id='id145'>使用方法</h3>
+
+<p>使用<code>I18n.t</code>這個方法來做翻譯詞彙的替換。而在 View 中可以直接使用 t 方法。翻譯關鍵字可以用字串或 Symbol，也可以加上 Scope，例如:</p>
+
+<pre><code>t(&quot;admin.event&quot;)
+t(:event, :scope =&gt; :admin )</code></pre>
+
+<p>搭配的 yml 設定範例：</p>
+
+<pre><code>&quot;zh-TW&quot;
+  admin:
+    event: 活動</code></pre>
+
+<blockquote>
+<p>注意 YAML 格式的縮排必須使用兩個空隔，Tab 是不允許的。直接複製貼上可能會有問題，請重新縮排過。</p>
+</blockquote>
+
+<p>要在詞彙內嵌的話，可以使用<code>%{variable_name}</code>：</p>
+
+<pre><code>&quot;zh-TW&quot;
+    hello: &quot;親愛的%{name}你好!&quot;</code></pre>
+
+<p>在樣板中傳入參數即可：</p>
+
+<pre><code>t(:hello, :name =&gt; @user.name) # 親愛的XXX你好</code></pre>
+
+<h2 id='model'>搭配<em>Model</em>使用</h2>
+
+<p>在套用上述的翻譯詞彙檔之後，你可能會注意到<em>Model</em>驗證錯誤訊息會變成如<em>Name 不能是空白字元</em>，如果需要近一步中文化欄位名稱，你可以新增<em>config/locales/events.yml</em>內容如下：</p>
+
+<pre><code>zh-TW:
+  activerecord: 
+    attributes:
+      event:
+        name: &quot;活動名稱&quot;
+        description: &quot;描述&quot;</code></pre>
+
+<p>其實，翻譯檔檔名叫<em>events.yml</em>、<em>zh-TW.yml</em>、<em>en.yml</em>什麼都無所謂，重要的是<em>YAML</em>結構中第一層要對應<em>locale</em>的名稱，也就是<code>zh-TW</code>，<em>Rails</em>會載入<em>config/locales</em>下所有的<em>YAML</em>詞彙檔案。</p>
+
+<h3 id='id146'>如何讓使用者可以切換多語系</h3>
+
+<p>在 application_controller.rb 中加入:</p>
+
+<pre><code>before_filter :set_locale
+		
+def set_locale
+  # 可以將 [&quot;en&quot;, &quot;zh-TW&quot;] 設定為 VALID_LANG 放到 config/environment.rb 中
+  if params[:locale] &amp;&amp; I18n.available_locales.include?( params[:locale].to_sym )
+    session[:locale] = params[:locale]
+  end
+
+  I18n.locale = session[:locale] || I18n.default_locale
+end			</code></pre>
+
+<p>在 View 中可以這樣做:</p>
+
+<pre><code>&lt;%= link_to &quot;中文版&quot;, :controller =&gt; controller.controller_name, 
+   	         :action =&gt; controller.action_name, :locale =&gt; &quot;zh-TW&quot;	%&gt;
+&lt;%= link_to &quot;English&quot;, :controller =&gt; controller.controller_name, 
+   	         :action =&gt; controller.action_name, :locale =&gt; &quot;en&quot; %&gt;	</code></pre>
+
+<h3 id='id147'>語系樣板</h3>
+
+<p>除了上述一個單字一個單字的翻譯詞彙替換之外，如果樣板內大多是屬於較為靜態的內容，<em>Rails</em>也提供了不同語系可以有不同樣板，你只要將樣板命名加上語系附檔名即可，例如：</p>
+
+<pre><code>app/views/pages/faq.zh-TW.html.erb
+app/views/pages/faq.en.html.erb</code></pre>
+
+<p>如此在英文版的時候就會使用<em>faq.en.html.erb</em>這個樣板，中文版時使用<em>faq.zh-TW.html.erb</em>這個樣板。</p>
+
+<h3 id='_timezone'>時區 TimeZone</h3>
+
+<p>首先，資料庫裡面的時間一定都是儲存 UTC 時間。而 Rails 提供的機制是讓你從資料庫拿資料時，自動幫你轉換時區。例如，要設定台北 +8 時區：</p>
+
+<p>首先設定 config/application.rb 中預設時區為 config.time_zone = &#8220;Taipei&#8221;，如此 ActiveRecord 便會幫你自動轉換時區，也就是拿出來時 +8，存回去時 -8</p>
+
+<h4 id='id148'>如何根據使用者切換時區?</h4>
+
+<p>首先，你必須找個地方儲存不同使用者的時區，例如 User model 有一個欄位叫做 time_zone:string。然後在編輯設定的地方，可以讓使用者自己選擇時區:</p>
+
+<pre><code> &lt;%= time_zone_select &#39;user&#39;,&#39;time_zone&#39; %&gt;</code></pre>
+
+<p>接著在 application_controller.rb 中加入:</p>
+
+<pre><code>before_filter :set_timezone
+		
+def set_timezone
+   if logged_in? &amp;&amp; current_user.time_zone
+      Time.zone = current_user.time_zone
+    end
+end</code></pre>
+
+<h4 id='id149'>時區處理方法</h4>
+
+<p><em>Ruby</em>原生的<em>Time</em>類別對於時區的處理一律是參考唯一的系統環境變數<code>ENV[&#39;TZ&#39;]</code>，這在使用者多時區的應用程式中就顯的見拙。因此在<em>Rails</em>中的時間類別使用的是<em>ActiveSupport::TimeWithZone</em>，我們已經知道可以使用<code>Time.zone</code>可以改變時區，其他的用法例如：</p>
+
+<pre><code>Time.zone = &quot;Taipei&quot;
+Time.zone.local(2011, 8, 3, 9, 0) # 建立一個Taipei當地時間
+=&gt; Wed, 03 Aug 2011 09:00:00 CST +08:00
+t = Time.zone.now # 目前時間
+=&gt; Wed, 03 Aug 2011 22:17:54 CST +08:00
+t.in_time_zone(&quot;Tokyo&quot;) # 將這個時間換時區
+=&gt; Wed, 03 Aug 2011 23:18:34 JST +09:00
+Time.utc(2005,2,1,15,15,10).in_time_zone # 將UTC時間換Taipei當地時間
+=&gt; Tue, 01 Feb 2005 23:15:10 CST +08:00</code></pre>
+
+<h3 id='unicode_'>Unicode 處理</h3>
+
+<p>在 Ruby 1.8 的字串其實只是 byte 的集合，如果你需要對 UTF-8 字串做一些函式操作，例如計算字數或字串替換，Rails 提供了 mb_chars 來包裝以獲得正確的結果，例如:</p>
+
+<pre><code>&quot;中文&quot;.size # 6
+&quot;中文&quot;.mb_chars.size # 2</code></pre>
+
+<p>詳細的 API 文件請參考 <a href='http://api.rubyonrails.org/classes/ActiveSupport/Multibyte/Chars.html'>http://api.rubyonrails.org/classes/ActiveSupport/Multibyte/Chars.html</a></p>
+
+<p>如果你使用 Ruby 1.9，就不需要使用 mb_chars 了。Ruby 1.9 支援各種不同的 Encoding，請參考<a href='ruby.html'>Ruby 程式語言入門</a>一章的 Ruby 1.9 章節。</p>
+
+<h3 id='iconv'>Iconv</h3>
+
+<p>如果你需要在不同語系中處理，例如 Big5，那個 Ruby 的內建函式庫 Iconv 可以幫你處理轉換。</p>
+
+<p>(TODO) API 文件 <a href='http://ruby-doc.org/stdlib/libdoc/iconv/rdoc/index.html'>http://ruby-doc.org/stdlib/libdoc/iconv/rdoc/index.html</a></p>
+
+<h3 id='id150'>更多線上資源</h3>
+
+<ul>
+<li><a href='http://www.slideshare.net/ihower/rails-i18n-20081125-presentation'>Rails I18n 投影片</a></li>
+
+<li>Rails Internationalization (I18n) API <a href='http://edgeguides.rubyonrails.org/i18n.html'>http://edgeguides.rubyonrails.org/i18n.html</a></li>
+</ul>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

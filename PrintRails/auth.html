@@ -1,0 +1,185 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | Rails 使用者認證</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/auth.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='id124'>使用者認證</h2>
+<div id='submenu'>
+<h3>本章目錄</h3>
+<ul>
+<li>Authentication: Devise</li>
+<li>Authentication: OmniAuth</li>
+<li>Authentication: DIY</li>
+<li>Authentication: SSO</li>
+<li>Authorization</li>
+</ul>
+</div>
+<h3 id='authentication__devise'>Authentication: 使用 Devise</h3>
+
+<p><a href='http://github.com/plataformatec/devise'>devise</a>是一套使用者認證(Authentication)套件。</p>
+
+<ul>
+<li>
+<p>編輯 Gemfile 加上</p>
+
+<pre><code>  gem &#39;devise&#39;</code></pre>
+</li>
+
+<li>
+<p>輸入<code>bundle install</code>安裝此套件</p>
+</li>
+
+<li>
+<p>輸入<code>rails g devise:install</code>產生<em>devise</em>設定檔</p>
+</li>
+
+<li>
+<p>編輯 config/environments/development.rb 和 production.rb 加入寄信時預設的網站網址：</p>
+
+<pre><code>  config.action_mailer.default_url_options = { :host =&gt; &#39;localhost:3000&#39; }</code></pre>
+</li>
+
+<li>
+<p>確認 app/views/layouts/application.html.erb layout 中可以顯示 flash 訊息，例如</p>
+
+<pre><code>  &lt;p class=&quot;notice&quot;&gt;&lt;%= notice %&gt;&lt;/p&gt;
+  &lt;p class=&quot;alert&quot;&gt;&lt;%= alert %&gt;&lt;/p&gt;</code></pre>
+</li>
+
+<li>
+<p>確認 routes.rb 中有設定網站首頁位置，例如</p>
+
+<pre><code>  root :to =&gt; &quot;welcome#index&quot;</code></pre>
+</li>
+
+<li>
+<p>輸入<code>rails g devise user</code>產生 User model 及 Migration</p>
+</li>
+
+<li>
+<p>如果需要<em>E-mail</em>驗證功能，可以編輯<code>app/models/user.rb</code>和<code>migration</code>將<em>confirmable</em>功能打開</p>
+</li>
+
+<li>
+<p>輸入<code>rails generate devise:views</code>產生樣板，這會包括有註冊、登入、忘記密碼、<em>Email</em>等等頁面，放在<em>app/views/devise</em>目錄下。</p>
+</li>
+
+<li>
+<p>輸入<code>bundle exec rake db:migrate</code>建立資料表</p>
+</li>
+</ul>
+
+<h4 id='id125'>用法</h4>
+
+<ul>
+<li>
+<p>在需要登入的 controller 加上<code>before_filter :authenticate_user!</code></p>
+</li>
+
+<li>
+<p>可以在 Layout 中加上登入登出選單</p>
+
+<pre><code>   &lt;% if current_user %&gt;
+       &lt;%= link_to(&#39;登出&#39;, destroy_user_session_path) %&gt; |
+     &lt;%= link_to(&#39;修改密碼&#39;, edit_registration_path(:user)) %&gt;
+   &lt;% else %&gt;
+   	  &lt;%= link_to(&#39;註冊&#39;, new_registration_path(:user)) %&gt; |
+        &lt;%= link_to(&#39;登入&#39;, new_session_path(:user)) %&gt;
+   &lt;% end %&gt;</code></pre>
+</li>
+</ul>
+
+<h3 id='authentication__omniauth'>Authentication: 使用 Omniauth</h3>
+
+<p><em><a href='https://github.com/intridea/omniauth'>Omniauth</a></em></p>
+
+<h3 id='authentication_diy'>Authentication: DIY</h3>
+
+<ul>
+<li><a href='http://asciicasts.com/episodes/270-authentication-in-rails-3-1'>Authentication in Rails 3.1</a></li>
+</ul>
+
+<h3 id='authentication_sso'>Authentication: SSO</h3>
+
+<p>可以採用<em>CAS</em>標準，推薦以下的<em>Sinatra</em>實作：</p>
+
+<ul>
+<li><a href='http://code.google.com/p/rubycas-server/'>rubycas-server</a></li>
+
+<li><a href='https://github.com/Econify/ClassyCAS'>ClassyCAS</a></li>
+</ul>
+
+<h3 id='authorization'>Authorization</h3>
+
+<ul>
+<li><a href='https://github.com/ryanb/cancan'>cancan</a></li>
+
+<li><a href='https://github.com/stffn/declarative_authorization'>declarative_authorization</a></li>
+
+<li>更多 <a href='https://www.ruby-toolbox.com/categories/rails_authorization'>More</a></li>
+</ul>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

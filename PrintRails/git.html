@@ -1,0 +1,167 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | Git 簡介</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/git.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='git_'>Git 簡介</h2>
+
+<p>Git 是 Ruby/Rails 世界中最為通行的版本控制系統，包括 Rails 本身以及絕大部分的套件都是使用 Git 來做版本控制，甚至可以說大部分都使用 <a href='http://github.com'>GitHub</a> 這個服務，GitHub 是基於 Git 這套分散式版本控制系統的 Repository hosting 應用，只要是開放原始碼軟體，都可以免費的使用這個服務。</p>
+
+<p>因為 Git 使用 SSH public/private key 來做認證，請參閱以下的安裝步驟產生 SSH Key。產生完之後，將 public key 複製貼到 Github 你的帳號之下，這樣就有存取 Github repository 權限了。</p>
+
+<h3 id='_windows'>安裝步驟 (Windows)</h3>
+
+<p>Windows 的 Git 請安裝 <a href='http://code.google.com/p/msysgit/'>msysgit</a>。如果是透過 RailsInstaller 安裝，則已經附帶安裝好了。請參考以下步驟產生 SSH key：</p>
+
+<pre><code>$ c:\RailsInstaller\Git\bin\ssh-keygen.exe -t rsa -C &quot;your_email@example.org&quot;</code></pre>
+
+<p>接著用文字編輯器打開 &#8220;%homedrive%%homepath%.ssh\id_rsa.pub&#8221; 的內容，即是你的 Public SSH key。</p>
+
+<blockquote>
+<p>如果需要 GUI 介面，可以加裝 <a href='http://code.google.com/p/tortoisegit/'>http://code.google.com/p/tortoisegit/</a>，記得進 Settings 修改 Git path 至 C:\RubyInstall\Git\bin 即可。可以參考這份<a href='http://www.slideshare.net/jason8301/tortoisegit-intro-in-traditional-chinese'>投影片</a>。</p>
+</blockquote>
+
+<p>Windows 平台上還有一件要注意的事情，就是對於換行字元的處理與 Unix/Mac 平台不同，會讓 Git 誤判成有修改，因此需要多以下設定：</p>
+
+<pre><code>$ git config --global core.autocrlf true
+$ git config --global core.safecrlf true</code></pre>
+
+<blockquote>
+<p>Github 上的安裝文件 <a href='http://help.github.com/win-set-up-git/'>http://help.github.com/win-set-up-git/</a></p>
+</blockquote>
+
+<h3 id='_mac'>安裝步驟 (Mac)</h3>
+
+<p>如果是透過 Homebrew 安裝的話：</p>
+
+<pre><code>$  brew install git
+$  ssh-keygen -t rsa -C &quot;your_email@youremail.com&quot;</code></pre>
+
+<p>產生的 public SSH key 會在 ~/.ssh/id_rsa.pub</p>
+
+<blockquote>
+<p>Github 上的安裝文件 <a href='http://help.github.com/mac-set-up-git/'>http://help.github.com/mac-set-up-git/</a></p>
+</blockquote>
+
+<h3 id='_ubuntu'>安裝步驟 (Ubuntu)</h3>
+
+<pre><code>$  sudo apt-get install -y git-core
+$  ssh-keygen -t rsa -C &quot;your_email@youremail.com&quot;</code></pre>
+
+<p>產生的 public SSH key 會在 ~/.ssh/id_rsa.pub</p>
+
+<blockquote>
+<p>Github 上的安裝文件 <a href='http://help.github.com/linux-set-up-git/'>http://help.github.com/linux-set-up-git/</a></p>
+</blockquote>
+
+<h3 id='_gitconfig_'>設定 .gitconfig 加上顏色。</h3>
+
+<p>編輯 ~/.gitconfig</p>
+
+<pre><code>[user]
+   name = Your Name
+   email = your_email@youremail.com
+[color]
+   diff = auto
+   status = auto
+   branch = auto
+   ui = auto</code></pre>
+
+<blockquote>
+<p>Windows 的使用者根目錄為 &#8220;%homedrive%%homepath%&#8221;，例如 C:\Documents and Settings\Administrator</p>
+</blockquote>
+
+<h3 id='id19'>中文線上資源</h3>
+
+<ul>
+<li><a href='http://zh-tw.whygitisbetterthanx.com/'>Why Git is Better than X</a></li>
+
+<li><a href='http://ihower.tw/blog/archives/2591'>Git 版本控制系統 (1)</a></li>
+
+<li><a href='http://ihower.tw/blog/archives/2620'>Git 版本控制系統(2) 開 branch 分支和操作遠端 repo.</a></li>
+
+<li><a href='http://ihower.tw/blog/archives/2622'>Git 版本控制系統(3) 還沒 push 前可以做的事</a></li>
+
+<li><a href='http://ihower.tw/blog/archives/5140'>Git flow 開發流程</a></li>
+</ul>
+
+<h3 id='id20'>英文線上資源</h3>
+<ul>
+<li><a href='http://git-scm.com'>http://git-scm.com</a></li>
+<li><a href='http://gitref.org/'>http://gitref.org</a></li>
+<li><a href='http://gitimmersion.com'>http://gitimmersion.com</a></li>
+<li><a href='http://www.gitready.com/'>http://www.gitready.com/</a></li>
+<li><a href='http://gitcasts.com/'>http://gitcasts.com/</a></li>
+<li><a href='http://progit.org/'>http://progit.org/</a></li>
+<li><a href='http://help.github.com/'>http://help.github.com</a></li>
+</ul>
+<h3 id='id21'>投影片下載</h3>
+
+<ul>
+<li>Git 和 GitHub 簡介入門 <a href='files/git-and-github.pdf'>http://ihower.tw/rails3/files/git-and-github.pdf</a></li>
+</ul>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

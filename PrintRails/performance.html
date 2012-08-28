@@ -1,0 +1,696 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | 效能</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/performance.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <div id='submenu'>
+<h3>本章目錄</h3>
+<ul>
+<li>ActiveRecord和SQL</li>
+<li>效能分析工具</li>
+<li>效能量測</li>
+<li>有效率的Ruby程式碼</li>
+<li>使用更快的Ruby函式庫</li>
+<li>Rails的快取機制</li>
+<li>靜態檔案</li>
+<li>Rails Metal</li>
+<li>Client-side web performance</li>
+<li>使用外部程式</li>
+<li>在Ruby裡寫C/C++程式</li>
+<li>HTTP快取</li>
+</ul>
+</div>
+<h2 id='id154'>效能與快取</h2>
+
+<p>即使程式的執行結果正確，但是如果你的網站效能不佳，載入頁面需要花很久時間，那們網站的使用性就會變得很差，甚至慢到無法使用。硬體的進步雖然可以讓我們不必再斤斤計較程式碼的執行速度，但是開發者還是需要擁有合理的成本觀念，要買快十倍的<em>CPU</em>或硬碟不只花十倍的錢也買不到，帶來的效能差異還不如你平常就避免寫出拖慢效能十倍甚至百倍的程式碼。</p>
+
+<p>效能問題其實可以分成兩種，一種是完全沒有意識到抽象化工具、開發框架的效能盲點，而寫下了執行效能差勁的程式碼。另一種則是對現有程式的效能不滿意，研究如何最佳化，例如利用快取機制隔離執行速度較慢的高階程式，來大幅提昇執行效能。</p>
+
+<p>關於快取，有句話是這樣說的：<em>&#8220;There are only two hard things in Computer Science: cache invalidation and naming things&#8221; by Phil Karlton</em>。在電腦硬體和軟體架構中，有非常多的設計都是圍繞在快取系統上，越快的效能代表可用的空間越少，這是成本效益。例如個人電腦上的<em>CPU</em>的快取分成<em>L1</em>、<em>L2</em>、<em>L3</em>，然後是記憶體、最後是硬碟空間，這之間的存取速度和可用空間差了好幾個數量級，前者對後者來說，就是一種快取層。而資料一旦被放到快取，就要去處理資料的<em>Consistent</em>一致性問題。設計網站應用程式也是一樣的道理，將運算過後的結果快取起來，下次要用不計算直接讀取就會比較快。但是什麼時候快取資料過期了需要重新運算呢?這就是令人頭痛的<em>cache invalidation</em>問題。</p>
+
+<p>這一章會先介紹第一種問題，這是一些使用<em>Rails</em>這種高階框架所需要注意的效能盲點<em>(anti-patterns)</em>，避免寫出不合理執行速度的程式。接下來，我們再進一步學習如何最佳化<em>Rails</em>程式，以及利用快取機制來大幅增加網站效能。</p>
+
+<blockquote>
+<p>另一個你會常聽到的名詞是擴展性(Scalability)。網站的擴展性不代表絕對的效能，而是研究如何在合理的硬體成本下，可以透過水平擴展持續增加系統容量。</p>
+</blockquote>
+
+<h3 id='activerecordsql'><em>ActiveRecord</em>和<em>SQL</em></h3>
+
+<p><em>ActiveRecord</em>抽象化了<em>SQL</em>操作，是頭號第一大效能盲點所在，你很容易沉浸在他帶來的開發高效率上，忽略了他的效能盲點直到上線爆炸。存取資料庫是一種相對很慢的<em>I/O</em>的操作：每一條<em>SQL query</em>都得耗上時間、執行回傳的結果也會被轉成<em>ActiveRecord</em>物件全部放進記憶體，會不會佔用太多？因此你得對會產生出怎樣的<em>SQL queries</em>有基本概念。</p>
+
+<ul>
+<li><a href='http://ihower.tw/blog/archives/1766'>最佳化 ActiveRecord SQL 查詢</a> es/1707)</li>
+</ul>
+
+<blockquote>
+<p><em>Engine Yard</em>也有一篇<em><a href='http://www.engineyard.com/blog/2009/thats-not-a-memory-leak-its-bloat/'>That’s Not a Memory Leak, It’s Bloat</a></em>講解了<em>ActiveRecord</em>的常見使用問題。</p>
+</blockquote>
+
+<h4 id='n1_queries'>N+1 queries</h4>
+
+<p><em>N+1 queries</em>是資料庫效能頭號殺手。<em>ActiveRecord</em>的<em>Association</em>功能很方便，所以很容易就寫出以下的程式：</p>
+
+<pre><code># model
+class User &lt; ActieRecord::Base
+  has_one :car
+end
+
+class Car &lt; ActiveRecord::Base
+  belongs_to :user
+end
+
+# your controller
+def index
+  @users = User.paginate( :page =&gt; params[:page], :per_page =&gt; 10 )
+end
+
+# view
+&lt;% @users.each do |user| %&gt;
+ &lt;%= user.car.name %&gt;
+&lt;% end %&gt;</code></pre>
+
+<p>我們在<em>View</em>中讀取<code>user.car.name</code>的值。但是這樣的程式導致了<em>N+1 queries</em>問題，假設<em>User</em>有10筆，這程式會產生出11筆<em>Queries</em>，一筆是查<em>User</em>，另外10筆是一筆一筆去查<em>Car</em>，嚴重拖慢效能。</p>
+
+<pre><code>SELECT * FROM `users` LIMIT 10 OFFSET 0
+SELECT * FROM `cars` WHERE (`users`.`id` = 1)
+SELECT * FROM `cars` WHERE (`users`.`id` = 2)
+SELECT * FROM `cars` WHERE (`users`.`id` = 3)
+...
+...
+...
+SELECT * FROM `cars` WHERE (`users`.`id` = 10)</code></pre>
+
+<p>解決方法，加上<code>includes</code>：</p>
+
+<pre><code># your controller
+def index
+  @users = User.includes(:car).paginate( :page =&gt; params[:page], :per_page =&gt; 10 )
+end</code></pre>
+
+<p>如此<em>SQL query</em>就只有兩個，只用一個就撈出所有<em>Cars</em>資料。</p>
+
+<pre><code>SELECT * FROM `users` LIMIT 20 OFFSET 0
+SELECT * FROM `cars` WHERE (`users`.id IN(&#39;1&#39;,&#39;2&#39;,&#39;3&#39;,&#39;4&#39;,&#39;5&#39;,&#39;6&#39;,&#39;7&#39;,&#39;8&#39;,&#39;9&#39;,&#39;10&#39;))</code></pre>
+
+<blockquote>
+<p><em><a href='http://github.com/flyerhzm/bullet'>Bullet</a></em>是一個外掛可以在開發時偵測<em>N+1 queries</em>問題。</p>
+</blockquote>
+
+<h4 id='indexes'>索引<em>(Indexes)</em></h4>
+
+<p>沒有幫資料表加上索引也是常見的效能殺手，作為搜尋條件的資料欄位如果沒有加索引，<em>SQL</em>查詢的時候就會一筆筆檢查資料表中的所有資料，當資料一多的時候相差的效能就十分巨大。一般來說，以下的欄位都必須記得加上索引：</p>
+
+<ul>
+<li>外部鍵<em>(Foreign key)</em></li>
+
+<li>會被排序的欄位(被放在<code>order</code>方法中)</li>
+
+<li>會被查詢的欄位(被放在<code>where</code>方法中)</li>
+
+<li>會被<em>group</em>的欄位(被放在<code>group</code>方法中)</li>
+</ul>
+
+<p>如何幫資料庫加上索引請參考<em><a href='migration.html'>Migration</a></em>一章。</p>
+
+<blockquote>
+<p><em><a href='http://github.com/eladmeidar/rails_indexes'>rails_indexes</a></em>提供了<em>Rake</em>任務可以幫忙找忘記加的索引。</p>
+</blockquote>
+
+<h4 id='select'>使用<em>select</em></h4>
+
+<p><em>ActiveRecord</em>預設的<em>SQL</em>會把所有欄位的資料都讀取出來，如果其中有<em>text</em>或<em>binary</em>欄位資料量很大，就會每次都佔用很多不必要的記憶體拖慢效能。使用<em>select</em>可以只讀取出你需要的資料：</p>
+
+<pre><code>Event.select([:id, :title, :description]).limit(10)</code></pre>
+
+<p>進一步我們可以利用<em>scope</em>先設定好<em>select</em>範圍：</p>
+
+<pre><code>class User &lt; ActiveRecord::Base
+  scope :short, :select =&gt; &quot;id, name, email&quot;
+end
+
+User.short.limit(10)</code></pre>
+
+<h4 id='joinsincludes'>有些情況可以用<em>joins</em>取代<em>includes</em></h4>
+
+<pre><code>Group.includes(:group_memberships).where( [&quot;group_memberships.created_at &gt; ?&quot;, Time.now - 30.days ] )</code></pre>
+
+<p>以上的查詢只有在條件中用到<em>group_memberships</em>，所以可以換成<em>joins</em>增加效率：</p>
+
+<pre><code>Group.joins(:group_memberships).where( [&quot;group_memberships.created_at &gt; ?&quot;, Time.now - 30.days ] )</code></pre>
+
+<h4 id='counter_cache'>Counter cache</h4>
+
+<p>如果需要常計算<em>has_many</em>的<em>Model</em>有多少筆資料，例如顯示文章列表時，也要顯示每篇有多少留言回覆。</p>
+
+<pre><code>&lt;% @topics.each do |topic| %&gt;
+  主題：&lt;%= topic.subject %&gt;
+  回覆數：&lt;%= topic.posts.size %&gt;
+&lt;% end %&gt;</code></pre>
+
+<p>這時候<em>Rails</em>會產生一筆筆的<em>SQL count</em>查詢：</p>
+
+<pre><code>SELECT * FROM `posts` LIMIT 5 OFFSET 0
+SELECT count(*) AS count_all FROM `posts` WHERE (`posts`.topic_id = 1 )
+SELECT count(*) AS count_all FROM `posts` WHERE (`posts`.topic_id = 2 )
+SELECT count(*) AS count_all FROM `posts` WHERE (`posts`.topic_id = 3 )
+SELECT count(*) AS count_all FROM `posts` WHERE (`posts`.topic_id = 4 )
+SELECT count(*) AS count_all FROM `posts` WHERE (`posts`.topic_id = 5 )</code></pre>
+
+<p><em>Counter cache</em>功能可以把這個數字存進資料庫，不再需要一筆筆的<em>SQL count</em>查詢，並且會在<em>Post</em>數量有更新的時候，自動更新這個值。</p>
+
+<p>首先，你必須要在<em>Topic Model</em>新增一個欄位叫做<em>posts_count</em>，依照慣例是<code>_count</code>結尾，型別是<em>integer</em>，有預設值0。</p>
+
+<pre><code>rails g migration add_posts_count_to_topic</code></pre>
+
+<p>編輯<em>Migration</em>：</p>
+
+<pre><code>class AddPostsCountToTopic &lt; ActiveRecord::Migration
+  def self.up    
+    add_column :topics, :posts_count, :integer, :default =&gt; 0
+    
+    # 如果是網站上線後才新增這個功能，這裡需要先計算設定好初始值
+    Topic.find_each do |topic|
+      topic.update_attribute(:posts_count, topic.posts.size)
+    end
+  end
+  
+  def self.down
+    remove_column :topics, :posts_count
+  end
+end</code></pre>
+
+<p>編輯<em>Models</em>，加入<code>:counter_cache =&gt; true</code>：</p>
+
+<pre><code>class Topic &lt; ActiveRecord::Base
+  has_many :posts
+end
+
+class Posts &lt; ActiveRecord::Base
+  belongs_to :topic, :counter_cache =&gt; true
+end</code></pre>
+
+<p>這樣同樣的<code>@topic.posts.size</code>程式，就會自動變成使用<code>@topic.posts_count</code>，而不會用<em>SQL count</em>查詢一次。</p>
+
+<h4 id='batch_finding'>Batch finding</h4>
+
+<p>如果需要撈出全部的資料做處理，強烈建議最好不要用<em>all</em>方法，因為這樣會把全部的資料一次放進記憶體中，如果資料有成千上萬筆的話，效能就墜毀了。解決方法是分次撈，每次幾撈幾百或幾千筆。雖然自己寫就可以了，但是<em>Rails</em>提供了<em>Batch finding</em>方法可以很簡單的使用：</p>
+
+<pre><code>Article.find_each do |a| 
+  # iterate over all articles, in chunks of 1000 (the default)
+end
+
+Article.find_each(:conditions =&gt; { :published =&gt; true }, :batch_size =&gt; 100 ) do |a| 
+  # iterate over published articles in chunks of 100
+end</code></pre>
+
+<p>或是</p>
+
+<pre><code>Article.find_in_batches do |articles| 
+  articles.each do |a| 
+    # articles is array of size 1000
+  end
+end
+
+Article.find_in_batches(batch_size =&gt; 100 ) do |articles| 
+  articles.each do |a| 
+    # iterate over all articles in chunks of 100
+  end
+end</code></pre>
+
+<h4 id='transaction_for_group_operations'>Transaction for group operations</h4>
+
+<p>在<em>Transaction</em>交易範圍內的<em>SQL</em>效能會加快，如果是相關的<em>SQL</em>可以包在一起。</p>
+
+<pre><code>my_collection.each do |q|
+  Quote.create({:phrase =&gt; q})
+end
+
+# Add transaction
+Quote.transaction do
+  my_collection.each do |q|
+    Quote.create({:phrase =&gt; q})
+ end
+end</code></pre>
+
+<h4 id='use_constant_for_domain_data'>Use Constant for domain data</h4>
+
+<p>不會變的資料可以用常數在<em>Rails</em>啟動時就放到記憶體。</p>
+
+<pre><code>class Rating &lt; ActiveRecord::Base
+  G  = Rating.find_by_name(&#39;G&#39;)
+  PG = Rating.find_by_name(&#39;PG&#39;)
+  R  = Rating.find_by_name(&#39;R&#39;)
+  #....  
+end
+
+Rating::G
+Rating::PG
+Rating::R</code></pre>
+
+<blockquote>
+<p>注意在<em>development mode</em>中不會作用，要在<em>production mode</em>才有快取效果。</p>
+</blockquote>
+
+<h4 id='fulltext_search_engine'>全文搜尋<em>Full-text search engine</em></h4>
+
+<p>如果需要搜尋<em>text</em>欄位，因為資料庫沒辦法加索引，所以會造成<em>table scan</em>把資料表所有資料都掃描一次，效能會非常低落。這時候可以使用外部的全文搜尋伺服器來做索引，目前常見有以下選擇：</p>
+
+<ul>
+<li><em><a href='http://sphinxsearch.com/'>Sphinx</a></em>全文搜尋引擎和<em><a href='http://freelancing-god.github.com/ts/en/'>thinking_sphinx</a> gem</em></li>
+
+<li><em><a href='http://lucene.apache.org/solr/'>Apache Solr(Lucenel)</a></em>全文搜尋引擎和<em><a href='https://github.com/outoftime/sunspot'>Sunspot</a> gem</em></li>
+
+<li><em><a href='http://xapian.org/'>Xapian</a></em>全文搜尋引擎和<em><a href='https://github.com/ryanb/xapit'>xapit</a> gem</em></li>
+
+<li><em>PostgreSQL</em>內建有全文搜尋功能，可以搭配 <em><a href='https://github.com/tenderlove/texticle'>texticle</a></em></li>
+
+<li><em><a href='http://www.davebalmain.com/trac'>Ferret</a></em>和<em><a href='https://github.com/jkraemer/acts_as_ferret'>acts_as_ferret</a> gem</em>。<em>Ferret</em>是一套純用<em>Ruby</em>實作的全文搜尋引擎。</li>
+</ul>
+
+<blockquote>
+<p><a href='http://ihower.tw/blog/archives/1716'>全文搜尋 Sphinx on Rails</a>這篇有介紹如何設定<em>Sphinx</em>支援<em>UTF-8</em>中文。</p>
+</blockquote>
+
+<p>http://ayaya.tw/blog/2011/11/02/setup-thinking-sphinx-with-chinese-support/</p>
+
+<h4 id='sql_query_planner'>SQL Query Planner</h4>
+
+<p><em><a href='http://github.com/dsboulder/query_reviewer'>QueryReviewer</a></em>這個套件透過<code>SQL EXPLAIN</code>分析<em>SQL query</em>的效率。</p>
+
+<h3 id='id155'>最佳化效能</h3>
+
+<p>關於程式效能最佳化，<em>Donald Knuth</em>大師曾開示「<em>We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil&#8221;</em>」，在效能還沒有造成問題前，就為了優化效能而修改程式和架構，只會讓程式更混亂不好維護。</p>
+
+<p>也就是說，當效能還不會造成問題時，程式的維護性比考慮效能重要。<em>80/20</em>法則：會拖慢整體效能的程式，只佔全部程式的一小部分而已，所以我們只最佳化會造成問題的程式。接下來的問題就是，如何找到那一小部分的效能瓶頸，如果用猜的去找那<em>3%</em>造成效能問題的程式，再用感覺去比較改過之後的效能好像有比較快，這種作法一點都不科學而且浪費時間。善用分析工具找效能瓶頸，最佳化前需要測量，最佳化後也要測量比較。</p>
+
+<p>把所有東西都快取起來並不是解決效能的作法，這只會讓程式有更多的一致性問題，更難維護。另外也不要跟你的框架過不去，硬是要去改<em>Rails</em>核心，這會導致程式有嚴重的維護性問題。最後，思考出正確的演算法總是比埋頭改程式有效，只要資料一大，不論程式怎麼改，挑選<em>O(1)</em>的演算法一定就是比<em>O(n)</em>快。</p>
+
+<h3 id='id156'>效能分析工具</h3>
+
+<p>效能分析工具可以幫助我們找到哪一部分的程式最需要效能優化，哪些部分最常被使用者執行，如果能夠優化效益最高。</p>
+
+<ul>
+<li><em><a href='http://github.com/wvanbergen/request-log-analyzer'>request-log-analyzer</a></em>這套工具可以分析<em>Rails log</em>檔案</li>
+
+<li>透過商業<em>Monitor</em>產品：<a href='http://www.newrelic.com'>New Relic</a>、<a href='http://www.scoutapp.com'>Scout</a></li>
+
+<li>Rack::Bug Rails middleware 可以在開發的時候，插入一個工具列分析每個<em>request</em></li>
+
+<li>ruby-prof gem</li>
+
+<li>Rails command line</li>
+</ul>
+
+<h3 id='id157'>效能量測</h3>
+
+<ul>
+<li>Benchmark standard library</li>
+
+<li>Rails command line</li>
+
+<li>Rails helper methods: Creating report in your log file</li>
+</ul>
+
+<h4 id='id158'>一般性工具(黑箱)</h4>
+
+<p>參考<a href='http://ihower.tw/blog/archives/1749'>使用 httperf 做網站效能分析</a></p>
+
+<ul>
+<li>httperf</li>
+
+<li>apache ab</li>
+</ul>
+
+<p>How fast can this server serve requests?</p>
+
+<ul>
+<li>Use web server to serve static files as baseline measurement</li>
+
+<li>Do not run from the same server (I/O and CPU)</li>
+
+<li>Run from a machine as close as possible</li>
+</ul>
+
+<p>You need know basic statistics</p>
+
+<ul>
+<li>compare not just their means but their standard deviations and confidence intervals as well.</li>
+
+<li>Approximately 68% of the data points lie within one standard deviation of the mean</li>
+
+<li>95% of the data is within 2 standard deviation of the mean</li>
+</ul>
+
+<h3 id='ruby'>如何寫出更有效率的<em>Ruby</em>程式碼</h3>
+
+<p>參考<a href='http://ihower.tw/blog/archives/1691'>如何寫出有效率的 Ruby Code</a></p>
+
+<ul>
+<li>Instance variable faster than accessor</li>
+
+<li>Interpolated string faster than + operator</li>
+
+<li>In-Place updates</li>
+
+<li>Module and class definition scope only execute once</li>
+
+<li>Caching Data in Instance or Class Variables</li>
+
+<li>Useless .nil?</li>
+
+<li>Unnecessary block parameter &amp;block</li>
+
+<li>More&#8230;</li>
+
+<li>http://www.igvita.com/2008/07/08/6-optimization-tips-for-ruby-mri/</li>
+
+<li>http://ihower.tw/blog/archives/1691</li>
+
+<li>http://en.oreilly.com/rails2009/public/schedule/detail/8680</li>
+</ul>
+
+<p>對於一個長時間執行的<em>Ruby</em>程式，有時候擔心總共用了多少記憶體不是最重要的，波動幅度大讓<em>GC</em>常常啟動反而影響效能更大。關於<em>GC</em>可以參考<em><a href='http://merbist.com/2010/07/29/object-allocation-why-you-should-care/'>Ruby object allocation &amp; why you should care</a></em>這篇文章。</p>
+
+<h3 id='ruby'>使用更快的<em>Ruby</em>函式庫</h3>
+
+<p>有<em>C Extension</em>的<em>Ruby</em>函式庫總是比較快的，如果常用可以考慮安裝：</p>
+
+<ul>
+<li>XML parser <a href='http://nokogiri.org/'>http://nokogiri.org/</a></li>
+
+<li>JSON parser <a href='http://github.com/brianmario/yajl-ruby/'>http://github.com/brianmario/yajl-ruby/</a></li>
+
+<li>CSV parser <a href='http://www.toastyapps.com/excelsior/'>http://www.toastyapps.com/excelsior/</a></li>
+
+<li>HTTP client <a href='http://github.com/pauldix/typhoeus'>http://github.com/pauldix/typhoeus</a></li>
+
+<li>Date <a href='http://github.com/rtomayko/date-performance'>http://github.com/rtomayko/date-performance</a></li>
+</ul>
+
+<h3 id='rails'><em>Rails</em>的快取機制</h3>
+
+<p>我們在前幾節努力避免緩慢的資料庫<em>SQL</em>查詢，但是如果效能需要再進一步提昇，就需要用到快取機制來完全避免讀取資料庫。</p>
+
+<p>關於實作快取，有幾點觀念:</p>
+<ul>
+<li>快取處太多，程式會變複雜，增加維護的難度</li>
+<li>快取會增加除錯難度，資料不再只有唯一的資料庫版本</li>
+<li>快取如果沒寫好，可能會產生資料不一致的Bug、跟時間相關的Bug等等</li>
+<li>快取增加了寫程式的難度，像是Expire過期資料、資料的安全性(放在快取層的資料也需要被保護注意安全)</li>
+<li>會增加撰寫UI的難度，因為快取相關的程式可能會混在View中</li>
+</ul>
+<p><em>Rails</em>內建了快取功能，可以讓我們將<em>SQL</em>結果或是<em>HTML</em>結果放到<em>Cache Store</em>中，這樣下一次就不需要重新運算，大幅提高效能。</p>
+
+<h4 id='cache_store'>Cache Store</h4>
+
+<p><em>Rails</em>提供了許多不同的<em>Cache Store</em>可以選擇，一般來說，推薦使用<em>Memcached</em>：</p>
+
+<pre><code>ActionController::Base.cache_store = :mem_cache_store, &quot;localhost&quot;
+ActionController::Base.cache_store = :compressed_mem_cache_store, &quot;localhost&quot;
+
+ActionController::Base.cache_store = :memory_store
+ActionController::Base.cache_store = :synchronized_memory_store
+
+ActionController::Base.cache_store = :file_store, &quot;/path/to/cache/directory&quot;
+ActionController::Base.cache_store = :drb_store, &quot;druby://localhost:9192&quot;</code></pre>
+<div class='aside warning'>
+
+<p><em>Rails 3.1</em>引入了<em>Rack::Cache</em>機制可以取代<em>Page caching</em>，所以這個功能從核心中被移除了。</p>
+
+<h4>Page caching</h4>
+
+<p><em>Page caching</em>是最簡單的一種，它會將<em>Action</em>最後的<em>HTML</em>結果存成<em>public/</em>下的<em>HTML</em>檔案，也就是變成靜態網頁。</p>
+
+<pre>
+<code>
+class ProductsController &lt; ActionController
+  caches_page :index
+  def index; end
+end
+</code>
+</pre>
+
+<p>不過，也因為是靜態網頁了，不管怎樣的<em>Request</em>都回傳一樣的結果，沒有辦法顯示任何動態內容，所以實際上不常使用。</p>
+</div>
+<h4 id='rackcache'>Rack::Cache</h4>
+
+<p>(TODO)</p>
+
+<p>Added Rack::Etag and Rack::ConditionalGet to the default middleware stack.</p>
+
+<h4 id='action_caching'>Action caching</h4>
+
+<blockquote>
+<p><em>Rails</em>在<em>development mode</em>的快取是關閉的，請修改<code>config.action_controller.perform_caching = true</code></p>
+</blockquote>
+
+<p><em>Action caching</em>和<em>Page caching</em>一樣也是快取整頁的<em>HTML</em>結果，但是它會執行<em>Controller filter</em>。所以可以用<em>before_filter</em>來做認證檢查，增加了一些彈性。</p>
+
+<pre><code>class ProductsController &lt; ActionController
+
+  before_filter :authenticate, :only =&gt; [ :edit, :create ]
+  caches_action :edit
+
+  def index; end
+
+  def create
+    expire_page :action =&gt; :index
+    expire_action :action =&gt; :edit
+  end
+  
+  def edit; end
+end</code></pre>
+
+<p>缺點也和<em>Page caching</em>一樣，我們沒有辦法提供不同使用者有不同內容。</p>
+
+<p>範例程式中的<code>expire_page</code>和<code>expire_action</code>則會在資料有更新的時候，清除快取裡面的資料重新產生。</p>
+
+<h4 id='fragment_caching'>Fragment caching</h4>
+
+<p><em>Fragment caching</em>可以只快取<em>HTML</em>中的一小段元素，我們可以自由選擇要快取的區塊，例如側欄或是選單等等，讓我們有最大的彈性。也因為這種快取發生在<em>View</em>中，所以我們必須把快取程式放進<em>View</em>中，用<code>cache</code>包起來要快取的<em>Template</em>：</p>
+
+<pre><code>&lt;% cache(:key =&gt; [&#39;all_available_products&#39;, @latest_product.created_at].join(&#39;:&#39;)) do %&gt;
+  All available products:
+&lt;% end %&gt;</code></pre>
+
+<p>用了快取，就還要學會怎麼處理過期資料，也就是在資料有更新的時候，<em>expire</em>快取裡面的資料。首先，我們可以手動用清除：</p>
+
+<pre><code>rake tmp:cache:clear</code></pre>
+
+<p>不過這不太實用，我們必須寫自動的方式，在資料修改或刪除時，在適當的<em>Controller Action</em>中過期這些快取資料：</p>
+
+<pre><code>expire_fragment(:key =&gt; [&#39;all_available_products&#39;, @latest_product.created_at].join(&#39;:&#39;))</code></pre>
+
+<blockquote>
+<p><em>Fragment caching</em>的一個主要目的是避免<em>SQL</em>查詢，但是要注意會不會在<em>Controller Action</em>中就實際發出<em>SQL</em>查詢。大部分的情況因為<em>ActiveRecord</em>有<em>Lazy Laod</em>特性，會等到真正使用的時候(也就是在<em>Fragment cache</em>範圍裡)才會實際發出<em>SQL</em>查詢，所以不會有只節省到<em>render</em>時間，而沒有節省到<em>SQL</em>查詢時間的問題。如果真沒有辦法，只好違反一下<em>MVC</em>原則，把<em>SQL</em>查詢從<em>Controller</em>搬到<em>View</em>的<em>Fragment caching</em>中。</p>
+</blockquote>
+
+<h4 id='sweepers'>Sweepers</h4>
+
+<p>不過，在<em>Controler</em>塞滿<code>expire_</code>方法程式太亂了。如果程式多起來，比較好的作法是用<em>Model observer</em>，去觀察<em>Model</em>有變動時，就清除快取。這樣就避免將清除快取的程式混雜在<em>Controller</em>之中。</p>
+
+<pre><code>class StoreSweeper &lt; ActionController::Caching::Sweeper
+  # This sweeper is going to keep an eye on the Product model
+  observe Product
+
+  # If our sweeper detects that a Product was created call this
+  def after_create(product)
+      expire_cache_for(product)
+  end
+
+  # If our sweeper detects that a Product was updated call this
+  def after_update(product)
+    expire_cache_for(product)
+  end
+
+  # If our sweeper detects that a Product was deleted call this
+  def after_destroy(product)
+    expire_cache_for(product)
+  end
+
+  private
+  def expire_cache_for(record)
+    # Expire the list page now that we added a new product
+    expire_page(:controller =&gt; &#39;#{record}&#39;, :action =&gt; &#39;list&#39;)
+
+    # Expire a fragment
+   expire_fragment(:controller =&gt; &#39;#{record}&#39;, :action =&gt; &#39;recent&#39;, :action_suffix =&gt; &#39;all_products&#39;)
+  end
+end</code></pre>
+
+<h4 id='rails'>使用<em>Rails</em>快取</h4>
+
+<p>上述的作法都是將最後的<em>HTML</em>結果快取起來，但是有時候如果形式有很多種，例如同時提供<em>HTML</em>、<em>JSON</em>、<em>XML</em>等，或是有其他程式也想利用同一份快取，這時候我們可以考慮快取資料(字串、陣列或雜湊的基本形式)，而不是最後的<em>HTML</em>：</p>
+
+<pre><code>Rails.cache.read(&quot;city&quot;)   # =&gt; nil
+Rails.cache.write(&quot;city&quot;, &quot;Duckburgh&quot;)
+Rails.cache.read(&quot;city&quot;)   # =&gt; &quot;Duckburgh&quot;
+
+Rails.cache.fetch(&quot;#{id}-data&quot;) do
+  Book.sum(:amount, :conditions =&gt; { :category_id =&gt; self.category_ids } )
+end</code></pre>
+
+<h4 id='memcached'>Memcached</h4>
+
+<p>參考<a href='http://ihower.tw/blog/archives/1768'>如何使用 memcached 做快取</a></p>
+
+<p>Free &amp; open source, high-performance, distributed memory object caching system an in-memory key-value store for small chunks of arbitrary data (strings, objects) from results of database calls, API calls, or page rendering.</p>
+
+<ul>
+<li>Key: 256 characters</li>
+
+<li>Data: 1mb</li>
+
+<li>SET/ADD/REPLACE/GET operators</li>
+
+<li>NOT persistent data store</li>
+
+<li>caching “noreply” principle</li>
+</ul>
+
+<p>Caching secret</p>
+
+<ul>
+<li>Key naming</li>
+
+<li>Expiration</li>
+</ul>
+
+<p>Caching Expire</p>
+
+<ul>
+<li>expire it after create/update/delete</li>
+
+<li>race condition? lock it first.</li>
+
+<li>reset it after update</li>
+
+<li>race condition first time? lock it first.</li>
+
+<li>set expire time</li>
+
+<li>race condition? proactive cache refill</li>
+</ul>
+
+<h3 id='rails_metal'>Rails Metal</h3>
+
+<p>參考<a href='http://ihower.tw/blog/archives/4561'>Rails3: 新的 Metal 機制</a></p>
+
+<h3 id='webcdn'>靜態檔案使用<em>Web</em>伺服器甚至<em>CDN</em>提供</h3>
+
+<p>Web server is 10x faster than your application server Set :x_sendfile to true if you use Apache mod_xsendfile or Lighttpd</p>
+
+<blockquote>
+<p><a href='https://tn123.org/mod_xsendfile'>Apache mod_xsendfile</a></p>
+</blockquote>
+
+<h3 id='clientside_web_performance'>Client-side web performance</h3>
+
+<p>參考<a href='http://ihower.tw/blog/archives/1707'>Rails Front-End 優化</a></p>
+
+<ul>
+<li><a href='http://developer.yahoo.com/yslow/'>http://developer.yahoo.com/yslow/</a></li>
+
+<li><a href='http://code.google.com/speed/page-speed/'>http://code.google.com/speed/page-speed/</a></li>
+</ul>
+
+<h3 id='id159'>使用外部程式</h3>
+
+<p><em>Ruby</em>不是萬能，有時候直接呼叫外部程式是最快的作法：</p>
+
+<pre><code>def thumbnail(temp, target)
+  system(&quot;/usr/local/bin/convert #{escape(temp)} -resize 48x48! #{escape(target}&quot;)
+end</code></pre>
+
+<h3 id='rubycc'>在<em>Ruby</em>裡寫<em>C/C++</em>程式</h3>
+
+<ul>
+<li><a href='http://rubyinline.rubyforge.org/RubyInline/'>RubyInline</a>: Write foreign code within ruby code</li>
+
+<li><a href='http://rice.rubyforge.org/'>Rice</a>: Ruby Interface for C++ Extensions</li>
+
+<li><a href='http://github.com/ffi/ffi'>Ruby-FFI</a>: a ruby extension for programmatically loading dynamic libraries</li>
+</ul>
+
+<h3 id='http'><em>HTTP</em>快取</h3>
+
+<p><em>Rails 3.1</em>內建<em>rake-cache</em></p>
+
+<p>(TODO)</p>
+
+<h3 id='id160'>投影片</h3>
+<div id='__ss_3299364' style='width:425px'><strong style='display:block;margin:12px 0 4px'><a title='Rails Performance' href='http://www.slideshare.net/ihower/rails-performance'>Rails Performance</a></strong><object width='425' id='__sse3299364' height='355'><param name='movie' value='http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=rails-performance-2010226-100228083842-phpapp01&stripped_title=rails-performance' /><param name='allowFullScreen' value='true' /><param name='allowScriptAccess' value='always' /><embed type='application/x-shockwave-flash' allowscriptaccess='always' width='425' src='http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=rails-performance-2010226-100228083842-phpapp01&stripped_title=rails-performance' name='__sse3299364' allowfullscreen='true' height='355' /></object><div style='padding:5px 0 12px'>View more <a href='http://www.slideshare.net/'>presentations</a> from <a href='http://www.slideshare.net/ihower'>Wen-Tien Chang</a>.</div></div>
+<h3 id='id161'>其他線上資源</h3>
+
+<ul>
+<li>Caching with Rails: An overview <a href='http://guides.rubyonrails.org/caching_with_rails.html'>http://guides.rubyonrails.org/caching_with_rails.html</a></li>
+
+<li>Performance Testing Rails Applications <a href='http://guides.rubyonrails.org/performance_testing.html'>http://guides.rubyonrails.org/performance_testing.html</a></li>
+
+<li>Scaling Rails Series <a href='http://railslab.newrelic.com/scaling-rails'>http://railslab.newrelic.com/scaling-rails</a></li>
+</ul>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

@@ -1,0 +1,88 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | 非同步處理</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/background-process.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='id126'>非同步處理</h2>
+
+<p>一個 request 的工作時間應該控制在 500ms 以內，理想上都要在 200ms 以內完成，要不然 web server 通常也會限制在 30 秒以內，不然就會出現 timeout 錯誤。一個運算時間太久的 request 除了讓使用者感受不佳之外，對於伺服器效能上的影響也很巨大。使用者可能等待不及重新reload，於是相同的任務又在重頭執行一遍。一個 request 長時間佔據了一個 rails process，也讓其他 reuqest 無法進行處理。</p>
+
+<p>於是，對於這種任務，非同步的處理就非常重要。非同步的意思是讓任務的處理在背景完成，而不在 request/response 的流程中完成，等完成之後再告訴使用者即可。</p>
+
+<h3 id='delayed_job'>delayed_job</h3>
+
+<p><em><a href='https://github.com/collectiveidea/delayed_job'>delayed_job</a></em>使用現有資料庫，方便安裝使用。</p>
+
+<h3 id='resque'>resque</h3>
+
+<p><em><a href='https://github.com/defunkt/resque'>resque</a></em>使用<em><a href='http://redis.io'>Redis</a></em>，效能較好。 ** https://github.com/bvandenbos/resque-scheduler ** https://github.com/lantins/resque-retry ** https://github.com/quirkey/resque-status ** https://github.com/zapnap/resque_mailer ** https://github.com/jayniz/resque-loner ** https://github.com/ono/resque-cleaner</p>
+
+<p>http://www.engineyard.com/blog/2011/the-resque-way/</p>
+
+<h3 id='id127'>投影片</h3>
+<div style='width:425px' id='__ss_2972360'><strong style='display:block;margin:12px 0 4px'><a href='http://www.slideshare.net/ihower/distributed-ruby-and-rails' title='Distributed Ruby and Rails'>Distributed Ruby and Rails</a></strong><object height='355' width='425' id='__sse2972360'><param value='http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=distributed-rails-100122081731-phpapp02&stripped_title=distributed-ruby-and-rails' name='movie' /><param value='true' name='allowFullScreen' /><param value='always' name='allowScriptAccess' /><embed height='355' width='425' src='http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=distributed-rails-100122081731-phpapp02&stripped_title=distributed-ruby-and-rails' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' name='__sse2972360' /></object><div style='padding:5px 0 12px'>View more <a href='http://www.slideshare.net/'>presentations</a> from <a href='http://www.slideshare.net/ihower'>Wen-Tien Chang</a>.</div></div>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

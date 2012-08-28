@@ -1,0 +1,354 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | Assets 與 Ajax</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/assets-and-ajax.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='assets__ajax_'>Assets 與 Ajax 應用程式</h2>
+<div id='submenu'>
+<h3>本章目錄</h3>
+<ul>
+<li>Asset 靜態檔案</li>
+<li>第一種方式：替換 HTML 片段</li>
+<li>第二種方式：使用 JavaScript 腳本</li>
+<li>第三種方式：使用 JSON 資料格式</li>
+<li>Ajax 表單</li>
+<li>Ajax 按鈕</li>
+<li>關於除錯</li>
+</ul>
+</div>
+<h2 id='assets'><em>Assets</em>靜態檔案</h2>
+
+<p><em>Assets</em>指的是<em>JavaScript</em>、<em>Stylesheets</em>和圖檔等靜態檔案，這些檔案並不會隨<em>Requests</em>不同而有所不同。而在<em>Rails</em>目錄中，只有<em>public</em>這個目錄是公開讀取的，所以通常我們會將靜態檔案都放在<em>public</em>這個目錄下，好讓瀏覽器可以直接讀取。但是隨著<em>JavaScript</em>和<em>Stylesheet</em>檔案越來越多時，如何管理這些檔案變為一項議題，為了加快瀏覽器的下載速度，我們會合併<em>JavaScript</em>和<em>Stylesheet</em>檔案，來減少瀏覽器<em>Request</em>下載次數。更進一步的還會壓縮這些檔案來加速下載時間。像是<em>Yahoo!</em>和<em>Google</em>都有各自開源出自己的壓縮工具<em><a href='http://developer.yahoo.com/yui/compressor/'>YUI Compressor</a></em>和<em><a href='http://code.google.com/closure/compiler/'>Closure Compiler</a></em>。</p>
+
+<p><em>Rails 3.1</em>引進了一項新功能叫做<em>Assets pipeline</em>，這個功能可以讓我們突破<em>public</em>目錄限制，可以將靜態檔案依需求放在不同目錄下，<em>Rails</em>會幫你組合並壓縮起來。特別是有一些<em>Rails</em>的外掛套件需要使用<em>JavaScript</em>等靜態檔案，在沒有這個功能之前，我們必須將<em>JavaScript</em>等檔案複製放在<em>public</em>目錄下，這樣瀏覽器才能讀取的到。</p>
+<div class='aside warning'>
+<p><em>Rails 3.1</em>之前版本想要有類似的功能，筆者推薦可以安裝<em><a href='http://documentcloud.github.com/jammit/'>Jammit</a></em>這套工具來管理<em>Assets</em>。如果是升級到<em>3.1</em>的話，記得在<em>config/application.rb</em>中加上<code>config.assets.enabled = true</code>才會啟用這個功能。</p>
+</div>
+<p><em>Assets</em>的位置在<em>app/assets/</em>下，首先最重要的就是<em>app/assets/javascripts/application.js</em>和<em>app/assets/stylesheets/application.css</em>，這兩個檔案看起來充滿註解，其實它是個<em>manifest</em>檔案，列出了所有要載入的靜態檔案，這些檔案的位置依照慣例放在<em>app/assets</em>或<em>vendor/assets</em>目錄下。</p>
+
+<p>讓我們先看看<em>application.js</em></p>
+
+<pre><code>// This is a manifest file that&#39;ll be compiled into including all the files listed below.
+// Add new JavaScript/Coffee code in separate files in this directory and they&#39;ll automatically
+// be included in the compiled file accessible from http://example.com/assets/application.js
+// It&#39;s not advisable to add code directly here, but if you do, it&#39;ll appear at the bottom of the
+// the compiled file.
+//
+//= require jquery
+//= require jquery_ujs
+//= require_tree .</code></pre>
+
+<p>其中的<code>require_jquery</code>和<code>require_jquery_ujs</code>會載入<em>JQuery</em>和<em>Rails</em>的<em>JQuery adapater</em>，這是因為我們在<em>Gemfile</em>中有裝<em>jquery-rails</em>這個套件，所以這裡可以讀取的到。而<code>require_tree .</code>會載入這個目錄下的所有<em>JavaScript</em>檔案。總之，這個<em>manifest</em>的最後輸出結果就是通通壓縮成一個<em>application.js</em>檔案。</p>
+
+<p>同理<em>application.css</em>也是一樣載入所有<em>stylesheets</em>目錄下的<em>CSS</em>檔案，最後壓縮成<em>application.css</em>：</p>
+
+<pre><code>/*
+ * This is a manifest file that&#39;ll automatically include all the stylesheets available in this directory
+ * and any sub-directories. You&#39;re free to add application-wide styles to this file and they&#39;ll appear at
+ * the top of the compiled file, but it&#39;s generally better to create a new file per style scope.
+ *= require_self
+ *= require_tree . 
+*/</code></pre>
+
+<p>讓我們看看<em>View</em>，在<em>Layout</em>檔案中：</p>
+
+<pre><code>&lt;%= stylesheet_link_tag    &quot;application&quot; %&gt;
+&lt;%= javascript_include_tag &quot;application&quot; %&gt;</code></pre>
+
+<p>因為最後輸出都壓縮成一個檔案了，所以這裡只需要載入<em>application.css</em>和<em>application.js</em>。</p>
+
+<h3 id='id118'>如何處理圖片</h3>
+
+<p>放在<em>app/assets/images</em>下的圖片該怎麼使用呢？在實際佈署後，<em>Rails</em>會將檔案名稱加以編碼，例如<em>rails.png</em>會變成<em>rails-bd9ad5a560b5a3a7be0808c5cd76a798.png</em>。這麼做的原因是當圖片有變更的時候，編碼就會不同而有不同的檔名，這樣就可以避免瀏覽器快取到舊的檔案。也因為檔案名稱會變動，所以放在<em>app/assets/images</em>下的圖片，要用的時候就沒有辦法寫死檔名。在一般的<em>View</em>中，可以使用<code>image_tag</code>這個<em>Helper</em>：</p>
+
+<pre><code>&lt;%= image_tag(&quot;rails.png&quot;) %&gt;</code></pre>
+
+<p>如果在<em>CSS</em>裡的話，有兩種辦法：一是將檔案命名為<em>erb</em>結尾，例如<em>app/assets/stylesheets/main.css.erb</em>，然後使用<code>asset_path</code>這個<em>Helper</em>：</p>
+
+<pre><code>h1 {
+  background-image: url(&#39;&lt;%= asset_path(&quot;rails.png&quot;) %&gt;&#39;);
+}</code></pre>
+
+<p>另一種方法是使用<em>Sass</em>或<em>SCSS</em>語法。其中<em>SCSS</em>相容於<em>CSS</em>。例如命名為<em>app/assets/stylesheets/main.css.scss</em>，然後使用<code>image-url</code>這個<em>Sass</em>提供的方法：</p>
+
+<pre><code>h1 {
+    background-image: image-url(&quot;rails.png&quot;)
+}</code></pre>
+
+<p>如果是<em>js</em>檔案中想要拿圖片的位置，就只能用<em>js.erb</em>的格式，然後內嵌<em>asset_path Helper</em>方法了。</p>
+
+<h3 id='precompile'><em>Precompile</em>編譯靜態檔案</h3>
+
+<p>放在<em>app/assets</em>目錄下的<em>Assets</em>，<em>Rails</em>支援使用不同的語法，例如使用<em><a href='http://sass-lang.com/'>Sass</a></em>語法產生<em>CSS</em>、<em><a href='http://jashkenas.github.com/coffee-script/'>CoffeeScript</a></em>產生<em>JavaScript</em>，或是用<em>ERb</em>樣板也可以。使用的方法是將附檔名命名成<em>.css.sass</em>、<em>.css.scss</em>、<em>.js.coffee</em>、<em>.css.erb</em>或<em>.js.erb</em>，<em>Rails</em>就會編譯出結果給瀏覽器。</p>
+
+<p><em>Sass</em>是一種<em>CSS3</em>語法的擴充，可以使用巢狀、變數、混入、選擇子繼承等等功能，可以更有效率有彈性的撰寫<em>Stylesheet</em>。<em>Sass</em>最後會編譯出合法的<em>CSS</em>讓瀏覽器使用。使用上它區分成兩種形式的語法<em>scss</em>和<em>sass</em>，前者可以與現有的<em>css</em>程式碼直接混合在一起，後者則透過縮排來省略了大括號<code>{}</code>(就像<em>Python</em>用縮排一樣)。<em>CoffeeScript</em>也是類似原理，它是一種迷你的程式語言，編譯之後會輸出可讀性高、符合<em><a href='http://www.javascriptlint.com/'>JavaScript Lint</a></em>規範的<em>JavaScript</em>程式碼。</p>
+
+<p>學習這兩種新語法需要額外的時間投入，但是對需要常常撰寫<em>CSS</em>和<em>JavaScript</em>的設計師來說，應該是很不錯的工具，讀者可以自行斟酌是否採用。如果你不打算使用的話，可以編輯<em>Gemfile</em>拿掉以下：</p>
+
+<pre><code>gem &#39;sass&#39;
+gem &#39;coffee-script&#39;</code></pre>
+
+<blockquote>
+<p>如果採用<em>Sass</em>的話，推薦還可以採用<em><a href='http://compass-style.org/'>Compass</a></em>這套<em>CSS</em>框架的框架。</p>
+</blockquote>
+
+<h3 id='id119'>編譯出最後結果</h3>
+
+<p>開發的時候，<em>Rails</em>會自動將<em>Asset</em>的壓縮結果快取在<em>tmp</em>下，所以開發者不需要特別處理。但是實際正式上線時，最後壓縮的檔案還是必須放在<em>public</em>目錄下由網頁伺服器直接提供(或是由CDN)效能較好，以下的<em>rake</em>指令可以產生出來：</p>
+
+<pre><code>rake assets:precompile</code></pre>
+
+<p>產生出來的檔案在<em>public/assets/</em>下。</p>
+
+<pre><code>rake assets:clean</code></pre>
+
+<p>這樣就會刪除。</p>
+
+<p>注意，如果在開發模式下執行了<code>rake assets:precompile</code>，那麼因為放在<em>public/assets/</em>下的靜態檔案會優先丟給瀏覽器，所以這時候再修改<em>app/assets</em>下的原始碼會沒有作用。所以，開發時請記得要刪除這個目錄。</p>
+
+<blockquote>
+<p>不過，如果你有很多靜態檔案的話，開發模式下每次都要重新編譯太辛苦了。你可以先<em>compile</em>一次，然後把<em>public/assets/</em>下目前正在開發的檔案砍掉即可。</p>
+</blockquote>
+
+<h3 id='id120'>如何拆成數個壓縮檔</h3>
+
+<p>上述的<em>application.js</em>或<em>application.css</em>中，預設會壓縮所有<em>app/assets</em>目錄下的檔案，如果你需要拆開，只需要修改其中的內容把<code>require_tree</code>那行移除，那麼就只會壓縮你所指定的目錄或檔案。</p>
+
+<p>例如，要新增新的<em>Manifest</em>檔案的話，假設叫做<em>app/assets/javascripts/search.js</em>，內容如：</p>
+
+<pre><code>//= require ./foobar</code></pre>
+
+<p>這樣就會將<em>assets/javascripts/foobar</em>這個目錄下的檔案通通壓縮成<em>search.js</em>，而在<em>View</em>中：</p>
+
+<pre><code>&lt;%= javascript_include_tag &quot;application&quot; %&gt;
+&lt;%= javascript_include_tag &quot;search&quot; %&gt;</code></pre>
+
+<p>就會載入。注意到如果啟用了<em>assets</em>功能，<code>javascript_include_tag</code>只能接受一個參數，即<em>Manifest</em>檔案的名稱。</p>
+
+<p>為了讓<code>rake assets:precompile</code>也能產生新的壓縮檔案，你還需要編輯<em>config/environments/production.rb</em>加入：</p>
+
+<pre><code>config.assets.precompile += %w( search.js )</code></pre>
+
+<h3 id='id121'>如何關閉這個功能</h3>
+
+<p>也可以不使用這個功能，請修改<em>config/application.rb</em>將以下設定改成<code>false</code>：</p>
+
+<pre><code>config.assets.enabled = false</code></pre>
+
+<p>這樣的話，在<em>View</em>中就必須列出所有你要載入的<em>Script</em>檔案：</p>
+
+<pre><code>&lt;%= stylesheet_link_tag    &quot;reset&quot;, &quot;application&quot;, :cache =&gt; &quot;all&quot; %&gt;
+&lt;%= javascript_include_tag &#39;jquery&#39;, &#39;rails&#39;, &#39;application&#39;, :cache =&gt; &quot;all&quot; %&gt;</code></pre>
+
+<p>這些檔案都必須放在<em>public</em>目錄下。而加上<code>cache</code>參數<em>Rails</em>會合併這些檔案，但是並不會壓縮。</p>
+
+<h2 id='ajax'>Ajax</h2>
+
+<p><em>Ajax</em>是<em>Asynchronous JavaScript and XML</em>的縮寫，是一種不需要重新整理頁面，透過<em>JavaScript</em>來與伺服器交換資料、更新網頁內容的技術。目的在於改善使用者的操作介面，提昇流暢度。它主要是透過瀏覽器提供的<code>XMLHttpRequestObject</code>來達成，不過因為跨瀏覽器的困難度，大多數人們會選擇使用<em>JavaScript Library</em>來處理<em>Ajax</em>，例如<em>JQuery</em>、<em>YUI</em>等。雖然<em>Ajax</em>的縮寫中包括<em>XML</em>，但是實務上並不一定要用<em>XML</em>格式，事實上也已經很少人使用<em>XML</em>當作傳輸的格式了。總歸來說，依照<em>Ajax</em>使用的格式分類，有三種方式：</p>
+
+<ul>
+<li>向伺服器請求 HTML 片段，然後客戶端瀏覽器上的 JavaScript 再替換掉頁面上的元素</li>
+
+<li>向伺服器請求 JavaScript 程式腳本，然後客戶端瀏覽器執行它</li>
+
+<li>向伺服器請求 JSON 或 XML 資料格式，然後客戶端瀏覽器的 JavaScript 解析後再動作。</li>
+</ul>
+
+<p>第一種方式非常簡單，但是限制是一次只能更新一小塊內容。Rails 比較常見使用第二種方式，容易使用彈性又大。而第三種方式則將 JavaScript 程式都放在客戶端瀏覽器上，相較於第二種則多了解析 JSON 或 XML 的部份。以<em>Web API</em>的設計角度來看，與表現層無關的<em>JSON</em>格式是比較乾淨的，可以獲得比較好的重複使用性。</p>
+
+<p>講解<em>JavaScript</em>和<em>JQuery</em>語法已經超過本書範圍，本章接下來會假設讀者已經有基本認識。身為一個<em>Web</em>程式設計師，不得不對<em>JavaScript</em>要有基本了解。</p>
+
+<h3 id='unobtrusive_javascript'>Unobtrusive JavaScript</h3>
+
+<p>Rails 從 3.0 開始將支援<em>Ajax</em>的<em>JavaScript</em>都改成用<em>Unobtrusive JavaScript(UJS)</em>的方式。什麼是<em>Unobtrusive</em>呢? 用個範例來說吧：</p>
+
+<pre><code>link_to &#39;Remove&#39;, event_path(1), :method =&gt; :delete</code></pre>
+
+<p>在<em>Rails 3</em>之前，會輸出：</p>
+
+<pre><code>&lt;a onclick=&quot;var f = document.createElement(&#39;form&#39;); f.style.display = &#39;none&#39;; this.parentNode.appendChild(f); f.method = &#39;POST&#39;; f.action = this.href;var m = document.createElement(&#39;input&#39;); m.setAttribute(&#39;type&#39;, &#39;hidden&#39;); m.setAttribute(&#39;name&#39;, &#39;_method&#39;); m.setAttribute(&#39;value&#39;, &#39;delete&#39;); f.appendChild(m);f.submit();return false;&quot; href=&quot;/events/1&quot;&gt;Remove&lt;/a&gt;</code></pre>
+
+<p>在<em>Rails 3</em>之後，會輸出：</p>
+
+<pre><code>&lt;a rel=&quot;nofollow&quot; data-method=&quot;delete&quot; class=&quot;delete&quot; href=&quot;/events/1&quot;&gt;Remove&lt;/a&gt;</code></pre>
+
+<p><em>Unobtrusive</em>也就是將<em>JavaScript</em>程式與<em>HTML</em>完全分開了。</p>
+
+<h3 id='_html_'>第一種方式：替換 HTML 片段</h3>
+
+<p>編輯 app/views/events/index.html.erb 最下方加入：</p>
+
+<pre><code>&lt;%= link_to &quot;say hello&quot;, { :controller =&gt; &quot;welcome&quot;, :action =&gt; &quot;say&quot; }, :id =&gt; &quot;ajax-load&quot;  %&gt;
+&lt;div id=&quot;content&quot;&gt;
+&lt;/div&gt;
+
+&lt;script type=&quot;text/javascript&quot; charset=&quot;utf-8&quot;&gt;
+    $(document).ready(function() {
+        
+        $(&#39;#ajax-load&#39;).click( function(){
+            $(&#39;#content&#39;).load( $(this).attr(&quot;href&quot;) );
+            return false;
+        });
+        
+    });
+&lt;/script&gt;</code></pre>
+
+<h3 id='_javascript_'>第二種方式：使用 JavaScript 腳本</h3>
+
+<p>編輯 app/views/events/index.html.erb，在迴圈中間加入</p>
+
+<pre><code>&lt;%= link_to &#39;ajax show&#39;, event_path(event), :remote =&gt; true, &quot;data-type&quot; =&gt; &quot;script&quot; %&gt;</code></pre>
+
+<p>編輯 app/controllers/events_controller.rb，在 show action 中加入</p>
+
+<pre><code>respond_to do |format|
+  format.html
+  format.js
+end	</code></pre>
+
+<p>新增 app/views/events/_event.html.erb，內容與 show.html.erb 相同</p>
+
+<p>新增 app/views/events/show.js.erb，內容如下</p>
+
+<pre><code>$(&#39;#content&#39;).html(&quot;&lt;%= escape_javascript(render :partial =&gt; &#39;event&#39;) %&gt;&quot;)
+             .css({ backgroundColor: &#39;#ffff99&#39; });</code></pre>
+
+<p>瀏覽 http://localhost:3000/events</p>
+
+<p><code>escape_javascript()</code>可以縮寫為<code>j()</code>。</p>
+
+<blockquote>
+<p><code>j()</code>是<em>Rails 3.1</em>之後版本才有</p>
+</blockquote>
+
+<h3 id='_json_'>第三種方式：使用 JSON 資料格式</h3>
+
+<p><em>JavaScript Object Notation(JSON)</em>是一種源自<em>JavaScript</em>的資料格式，是目前<em>Web</em>應用程式之間的準標準資料交換格式，在<em>Rails</em>之中，每個物件都有<code>to_json</code>方法可以很方便的轉換資料格式。 (TODO)</p>
+
+<pre><code>&lt;%= link_to &#39;ajax show&#39;, event_path(event), :remote =&gt; true, &quot;data-type&quot; =&gt; :json, :id =&gt; &quot;update_foobar&quot; %&gt;</code></pre>
+
+<p>點擊<em>ajax show</em>就會送出<em>Ajax request</em>了，但接下來要怎麼撰寫處理<em>JSON</em>的程式呢?</p>
+
+<pre><code>$(function() {
+    $(&#39;#update_foobar&#39;).bind(&quot;ajax:success&quot;, function(event, data) {            
+        var foobar = $(&#39;#foobar&#39;);
+        foobar.html( data.foobar_number );
+    });
+});</code></pre>
+
+<p>當然，你也可以把<em>HTML</em>片段當做<em>JSON</em>的資料來傳遞。</p>
+
+<p>另一種<em>JSON</em>的變形是<em>JSONP(JSON with Padding)</em>，將<em>JSON</em>資料包在一個<em>JavaScript function</em>裡，這個做的用處是讓這個<em>API</em>可以跨網域被呼叫。要回傳<em>JSONP</em>格式，只需要在<code>render :json</code>時多一個參數是<code>:callback</code>即可</p>
+
+<pre><code>respond_to do |format|
+  format.json { render :json =&gt; @user.to_json, :callback =&gt; &quot;process_user&quot; }
+end</code></pre>
+
+<blockquote>
+<p>或是使用<code>Rack::JSONP</code>這個<em>Middleware</em>，只要有<code>?callback=</code>參數就會自動變成<em>JSONP</em>。等同於上述使用<code>:callback =&gt; params[:callback]</code>。</p>
+</blockquote>
+
+<h4 id='ajax_'>Ajax 表單</h4>
+
+<p>除了超連結 link_to 加上 :remote 可以變成 Ajax 之外，表單 form_for 也可以加上 :remote 變成 Ajax。</p>
+
+<pre><code>form_for(@user, :remote =&gt; true</code></pre>
+
+<h4 id='ajax_'>Ajax 按鈕</h4>
+
+<p>同理於超連結 link_to，按鈕 button_to 加上 :remote =&gt; true 參數也會變成 Ajax。</p>
+
+<h3 id='id122'>關於除錯</h3>
+
+<p>使用 Ajax 後，因為頁面沒有經過重新整理，發送的 request 請後是在背景執行的，所以在除錯的時候需要有額外的工具來協助我們觀察 JavaScript 運作的情形。推薦您安裝 <a href='http://moztw.org/'>Firefox</a> 瀏覽器以及 <a href='https://addons.mozilla.org/zh-TW/firefox/addon/1843/'>Firebug</a> 這套工具。在<em>Safari</em>或<em>Chrome</em>也有內建類似<em>Firebug</em>的開發工具。</p>
+
+<h3 id='id123'>更多線上資源</h3>
+
+<ul>
+<li><a href='http://edgeguides.rubyonrails.org/asset_pipeline.html'>Asset Pipeline</a></li>
+
+<li><a href='http://asciicasts.com/episodes/268-sass-basics'>SASS Basic</a></li>
+
+<li><a href='http://asciicasts.com/episodes/267-coffeescript-basics'>CoffeeScript Basics</a></li>
+
+<li>https://github.com/rails/jquery-ujs/wiki/ajax</li>
+
+<li>https://github.com/rails/jquery-ujs/wiki/Unobtrusive-scripting-support-for-jQuery</li>
+
+<li>http://www.alfajango.com/blog/rails-3-remote-links-and-forms</li>
+
+<li>http://www.alfajango.com/blog/rails-3-remote-links-and-forms-data-type-with-jquery</li>
+
+<li>http://www.alfajango.com/blog/rails-jquery-ujs-now-interactive</li>
+
+<li>http://railsdog.com/blog/2011/02/28/callbacks-in-jquery-ujs-in-rails3</li>
+
+<li>https://moocode.com/posts/1-deploying-a-rails-3-1-application-to-production</li>
+
+<li>http://merbist.com/2011/08/30/deploying-a-rails-3-1-app-gotchas/</li>
+</ul>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

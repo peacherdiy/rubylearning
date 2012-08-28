@@ -1,0 +1,247 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | 常見問題</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/faq.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <div id='submenu'>
+    <h3><a href='author.html'>關於作者</a></h3>
+    <h3><a href='about.html'>關於本書</a></h3>
+    <h3><a href='faq.html'>常見問題</a></h3>
+    <h3><a href='ecosystem.html'>生態圈</a></h3>
+</div>
+<h2 id='rubyrails_'>Ruby/Rails 常見問題</h2>
+
+<h3 id='rails_'>問：Rails 好學易上手嗎?</h3>
+
+<p><em>Rails</em>並不算是好學的工具，好學跟好用是不一樣的。<em>Rails</em>是一個針對網站開發一個非常專業的框架。<em>Rails</em>有一個設計哲學是慣例優於設定，為了能夠上手，你必須熟悉這些慣例才能夠加速開發。這就像拿小畫家與<em>Adobe Photoshop</em>相比，前者非常好學，但是如果你要拿來當做吃飯的傢伙，就會選擇<em>Photoshop</em>而不是小畫家，而<em>Photoshop</em>是需要你投資時間下去學的。</p>
+
+<p>對於已經熟悉其他網站開發工具的朋友們，學習第二專長特別困難，因為這可能是你第一次必須先犧牲生產力以換取自我技能的提升。剛開始學習開發速度雖然降低了，但是如果開發網站是你拿來吃飯的專業技能，我相信投資學習<em>Rails</em>最後得到的回報是值得的。</p>
+
+<h3 id='ruby_18__ruby_19_'>問：Ruby 1.8 還是 Ruby 1.9 好?</h3>
+
+<p>目前的用戶數大約是7:3，而 Ruby 1.9 的使用者數會逐漸上升。比較起來，1.8 與套件相容性較佳，有些較舊的套件不一定與 1.9 相容。而 1.9 的執行效能和功能則較為進步，例如 Rails 3.1 已經有一些功能(HTTP Streaming)必須是 Ruby 1.9 才支援，而 Rails 4 更是將不支援 Ruby 1.8。所以，我的建議是如果你沒有已經開發好的 Ruby 1.8 程式包袱，那麼請考慮採用 Ruby 1.9。</p>
+
+<h3 id='why_ruby'>問：Why Ruby?</h3>
+
+<p>Ruby 是一套非常重視 Usability 的物件導向程式語言，非常看重程式碼的可讀性及維護性。Matz 在設計 Ruby 時，就特別考量一般人容不容易了解(他說我們都是凡人，像Lisp是給神人用的)。這也是為什麼你常常會聽到 Ruby 的程式碼自然簡潔又漂亮。您可以看看這份 Ruby 創造者 Matz 的<a href='files/whyruby-matz-rubyconfchina.pdf'>Why Ruby? 投影片</a> 或是 Matz 在 RubyConf 的演講: <a href='http://rubyconf2009.confreaks.com/19-nov-2009-09-00-keynote-yukuhiro-matz-matsumoto.html'>2009</a>、<a href='http://rubyconf2008.confreaks.com/matzs-keynote.html'>2008</a>，您會更了解及喜愛 Ruby 的哲學。</p>
+
+<p>Ruby 也是目前做 <a href='http://en.wikipedia.org/wiki/Domain-specific_language'>Domain-specific language(DSL)</a>，特別是 Internal DSL 最為成功的程式語言。透過 DSL，<strong>程式不但可以擁有非常好的可讀性，也可以大幅增加生產力</strong>。</p>
+
+<p>這些例子包括：Rails for Database-backed WebApp、<a href='http://github.com/nkallen/arel'>Arel</a> for SQL、<a href='http://martinfowler.com/articles/rake.html'>Rake</a> for building、<a href='http://www.sinatrarb.com/'>Sinatra</a> for WebApp、<a href='http://rspec.info/'>RSpec</a> for BDD Testing、<a href='http://github.com/opscode/chef'>Chef</a> for configuration management。<a href='http://cukes.info/'>Cucumber</a> 則是一套成功的 External DSL。這些函式庫正積極地影響我們對軟體開發的想法。我們相信，還會有更多更有趣的 DSL 出現。</p>
+
+<h3 id='why_rails'>問：Why Rails?</h3>
+
+<p>這是最常被問到的問題。首先，我要說這是一個從 CGI/Perl -&gt; Template 語言(如PHP、ASP) 到 Web framework 的時代，透過 Web framework 我們不必重新造輪子撰寫基礎功能。更重要的是，程式的可維護性大為增加。熟悉該 framework 的人，可以也快熟悉網站程式的架構。</p>
+
+<p>而各種程式語言要入門上手，其實都不會太困難。我認為重點會在於你能不能夠熟悉做事情的 framework。</p>
+
+<p>所以，撇開程式語言的偏好，Ruby on Rails 是目前 Web framework 中做前端(指生成HTML給瀏覽器) Application Server 最為成功的。它的概念也深深影響了非常多其他程式語言的後進 Web framework，例如 <a href='http://cakephp.org/'>CakePHP</a>、<a href='http://www.grails.org/'>Grails</a>、<a href='http://turbogears.org/'>TurboGears</a>、<a href='http://www.catalystframework.org/'>catalyst</a> 等等(模仿是最大的恭維)。我們可以用<strong>非常有效率</strong>的程式碼開發出網站應用程式。另外，可能會讓你感到意外的是，它也是目前動態語言中，<a href='http://ihower.tw/training/rails-ecosystem.html'>生態圈</a>最為豐富的框架。</p>
+
+<p>最豐富? 是的，你可以以 Rails 為關鍵字去搜尋書籍、研討會、顧問公司、第三方服務、Plugins 等。例如以 Rails 搜尋 Amazon 電腦類書籍有 60 筆、CakePHP 有 3 筆、Zend Framework 有 12 筆、codeIgniter 有 3 筆、symfony 有 14 筆、Django 有 13 筆、turbogears 有 2 筆。(2010/1)</p>
+
+<p>也有許多特別適合/針對 Rails 的第三方網路服務，例如 <a href='http://www.github.com'>Github</a>、<a href='http://www.heroku.com'>Heroko</a>、<a href='http://www.hoptoad.com'>hoptoad</a>、<a href='http://www.newrelic.com/'>New Relic</a>、<a href='http://postageapp.com/'>PostageApp</a>等等，都有提供 Ruby 套件支援。</p>
+
+<p>也因為使用 Rails 的人數多，所以在開發上各個方向都有人提供了最佳實務: 從如何寫出好的程式碼、網站安全性、網站性能、擴充性、全文搜尋、非同步處理等等。這是一個非常活躍的社群。</p>
+
+<h3 id='_rails__rails_developer'>問：我們公司很喜歡 Rails, 去哪裡找 Rails developer?</h3>
+
+<p>我必須很誠實的說，目前在台灣的人力市場尋找，例如 104，可能不太容易找到。我的建議是，從有經驗的 PHP/Java/.NET 的網站程式設計師找起，然後透過教育訓練學習 Ruby on Rails, 反而會比較容易。</p>
+
+<h3 id='__ruby_on_rails'>問： 要學習 Ruby on Rails，目前有什麼中文書籍呢？</h3>
+
+<p>因為 Rails 版本進步較快的關係，等到中文翻譯版問世通常過不久版本就過期了(目前到<em>Rails3</em>，書店裡的中文<em>Rails</em>書全部都是<em>Rails2</em>以前版本)，加上譯者都不是專業的 Rails developer，翻對翻錯都不知道，也不會有讀者服務和相容性勘誤。所以你想要找中文書，我只推薦你現在看的這本，不需要再看其他 Rails 中文書。</p>
+
+<p>Ruby 中文書方面，雖然翻譯方面可能差強人意，但是還可以一看。像是 &#8220;Ruby 程式設計密技 268, 博碩&#8221;, &#8220;Ruby Programming－向 Ruby 之父學程式設計, 博碩&#8221;, &#8220;Ruby 學習手冊, 歐萊禮&#8221;, &#8220;Ruby Cookbook 錦囊妙技, 歐萊禮&#8221;, &#8220;Ruby for Rails－Rails 開發者必備的 Ruby 學習手冊, 旗標&#8221;, &#8220;Ruby 程式設計, 歐萊禮&#8221; 等等。市面上的中文書都是 Ruby 1.8 的版本，不過語法幾乎與 1.9 是相容的。Ruby 1.9 與 1.8 最大的明顯差異在於 String Encoding 的處理上。</p>
+
+<p>原文書的選擇就多了，您可以參考<a href='/rails3/ecosystem'>Ruby/Rails生態圈</a>所推薦的書籍。</p>
+
+<h3 id='_rails_'>問：我們很喜歡 Rails, 可以找到外包公司來做嗎?</h3>
+
+<p>我可以推薦幾家給你，但是我也必須很誠實的說，目前你的選擇不太多。 如果你已經是網路或軟體公司，有自己的IT人員，那我會建議你直接由導入 Rails 開發，同上題講的方式。 如果你完全沒有網站開發營運經驗，那我可能就沒辦法幫上忙了，先找到一位你能信任的 IT 技術人員(無論什麼技術)吧，不然你打算怎麼維護?</p>
+
+<h3 id='_ruby__rails'>問：我很喜歡 Ruby 和 Rails，學了之後有工作做嗎?</h3>
+
+<p>請前往：</p>
+
+<ul>
+<li><a href='http://jobs.ruby.tw'>http://jobs.ruby.tw</a> 這是台灣的 Ruby Jobs Board</li>
+
+<li><a href='http://www.workingwithrails.com/browse/jobs/recent'>http://www.workingwithrails.com/browse/jobs/recent</a></li>
+
+<li><a href='http://ruby.jobamatic.com/a/jbb/find-jobs'>http://ruby.jobamatic.com/a/jbb/find-jobs</a></li>
+
+<li><a href='http://www.railsjob.com/'>http://www.railsjob.com/</a></li>
+
+<li><a href='http://jobs.37signals.com/'>http://jobs.37signals.com/</a></li>
+
+<li><a href='http://jobs.rubynow.com/'>http://jobs.rubynow.com/</a></li>
+</ul>
+
+<h3 id='ruby_on_rails__'>問：Ruby on Rails 的發展如何? 商業應用多嗎?</h3>
+
+<p>目前在國外已經有非常多的網站使用 Ruby on Rails 技術，您可以參考 <a href='http://rubyonrails.org/applications'>Ruby on Rails 官網上的例子</a>。其中 Twitter 和 Yellow Pages 更是證明了 Ruby on Rails 能夠承載超大量流量。(<a href='http://www.buildingwebapps.com/articles/6419-can-rails-scale-absolutely'>Can Rails Scale? Absolutely!</a>)</p>
+
+<p>就台灣來說，由於 Rails 特別適合全新的應用，所以目前已經有不少新興網站使用這項技術，據我所知包括(無特定排序)：</p>
+
+<ul>
+<li><a href='http://www.hemidemi.com/bookmark/'>HEMiDEMi 黑米共享書籤</a></li>
+
+<li><a href='http://friends.roodo.com/'>樂多朋友</a></li>
+
+<li><a href='http://www.goyou.com.tw/'>GoYou 投資圈</a> 及 <a href='http://www.algostars.net/'>AlgoStars</a></li>
+
+<li><a href='http://www.popo.tw/'>PoPo 原創</a> 及 <a href='http://www.qidian.com.tw/'>起點台灣分站</a></li>
+
+<li><a href='http://registrano.com'>Registrano</a></li>
+
+<li><a href='http://www.frienditude.com'>Frienditude</a></li>
+
+<li><a href='http://www.smilediet.com.tw/'>微笑餐盤 Smilediet</a></li>
+
+<li><a href='http://www.openfoundry.org/'>OpenFoundary</a></li>
+
+<li><a href='http://www.mycatch.cc/'>myCatch</a></li>
+
+<li><a href='http://www.iswii.net/'>iswii 美妝新聞台</a></li>
+
+<li><a href='http://veryxd.net/'>veryXD</a></li>
+
+<li><a href='http://belovely.tw/'>妝頭條</a></li>
+
+<li><a href='http://ticket.hypo.cc/'>hypo ticket</a></li>
+
+<li><a href='http://bingo.handlino.com'>和多繽紛樂</a></li>
+
+<li><a href='http://www.freebbs.tw/'>FREEBBS免費論壇系統主站</a></li>
+
+<li><a href='http://www.gameclub.tw/?area=111'>遊戲公會網 FLASH小遊戲網站</a></li>
+
+<li><a href='http://xfuture.org/'>未來事件交易所</a></li>
+
+<li><a href='http://www.techbang.com.tw'>PC home電腦家庭 T客邦</a></li>
+
+<li><a href='http://game.techbang.com.tw/'>T客邦 打電動</a></li>
+
+<li><a href='http://digiphoto.techbang.com.tw/'>DIGIPHOTO T客邦</a></li>
+
+<li><a href='http://www.babymap.com.tw'>寶貝地圖</a></li>
+
+<li><a href='http://goodlife.tw/'>goodlife 好生活</a></li>
+
+<li><a href='http://www.xuelele.com.tw/'>學樂樂</a></li>
+
+<li><a href='http://t17.techbang.com.tw/'>T17</a></li>
+</ul>
+
+<p>當然，也有更多是使用 Ruby on Rails 來進行內部專案而較不為外人所知。另外值得一提的是，Rails 也非常適合拿來開發 Facebook 應用程式。 就過去 Ruby Tuesday 聚會的經驗，有不少人其實是對 Ruby 感興趣的工程師，他們主要的背景是 PHP, .NET或Java。他們想要學習 Ruby 看看能不能引進他們的工作之中。也有些中小企業老闆也對 Rails 能帶來的快速開發速度，感到非常有興趣。簡而言之，相較於 PHP，Ruby 有著更多程式語言的良好特性，帶來更好的程式維護性。相較於 .NET 或 Java 的話，Ruby 則有著更好的生產力及樂趣。</p>
+
+<h3 id='rails__'>問：Rails 學習資源太少? 人才難找?</h3>
+
+<p>回答在 Why Rails? 了，Rails 的學習資源意外的多，人才方面則可以透過教育訓練。好手都很難找，不如挑容易 Training 的 Framework。挑學習力強的人才，而不限定本來一定要會。</p>
+
+<h3 id='rails_'>問：Rails 佈署會不會很麻煩?</h3>
+
+<p>Rails 剛推出時，只能使用 <a href='http://lightyror.thegiive.net/2006/12/ruby-on-rails_30.html'>Web server + Application server</a> 的架構，設定上的確比較麻煩。不過在 2008 年推出了 <a href='http://www.modrails.com/'>mod_rails (Passenger)</a>，就像 mod_php 一樣可以非常簡單的掛載到 Apache 或 Nginx 中成為一個模組，目前是最為方便的佈署方式，包括 <a href='http://37signals.com/'>37singals</a> 本身也都使用 Passenger。</p>
+
+<p>如果考慮雲端PaaS服務的話，<a href='http://heroku.com'>Heroko</a>是一家做的很成功的廠商。</p>
+
+<p>如果想知道更多，請參考 <a href='deployment.html'>佈署</a> 一章。</p>
+
+<h3 id='ruby__rails_'>問：Ruby 跟 Rails 的效能會不會很慢?</h3>
+
+<p>雖然 Ruby 這個程式語言在演算法效能上並不突出(事實上，任何動態語言都比不過靜態語言啊)，但是你必須了解程式語言的速度並不等於 Framework 的速度。Framework 包含了非常多的 call stack，框架寫的好不好才是關鍵。Rails 在這方面有非常多的關注，很意外地，如果跟 PHP 的框架比起來，Rails 的速度其實還<a href='http://avnetlabs.com/php/php-framework-comparison-benchmarks'>比較快</a>。</p>
+
+<h3 id='rails__scale_'>問：Rails 可以 Scale 嗎?</h3>
+
+<p>Scalability 的能力主要關乎於整體的網站架構，例如分散式 Message Queue、SOA 架構、Database 設計、與第三方服務的API等等，Application server 只是整體架構中的一個環節而已，Rails 的效能並不會是你做擴展上的阻礙(如果你不知道我在說什麼，你的 bottleneck 通常就是資料庫!)。從另一方面來看，Rails 的彈性反而幫助你逐步因應 Scale 而作架構調整。</p>
+
+<h3 id='rails_'>問：Rails 改版太快跟不上?</h3>
+
+<p>只有已經停止開發的函式庫，才不會有更新改版。Rails 目前還是個擁有強大開發能量的框架，而且相較於其他框架，Rails 比較沒這麼保守於向後相容這件事情上，雖然變更的API會上一個版本事先預告，但是版本之間的時間也沒差幾個月啊。伴隨著成長與進步，升級產生的痛似乎是再所難免。也就是說，如果你想一直跟上 Rails 升級的腳步，那麼就必須時常關注 Rails 社群的動向才行。</p>
+
+<p>Rails 版號分成Major、Minor、Tiny，其中Major的改變代表API有很多變更，升級主版號想必是辛苦的。Minor版號則代表新功能以及少部分的API變更，要升級會有點小痛。Tiny版號則為Bug fixes，應該可以無痛升級。如果不想被升級炸到，看到任何一個新版號出來，請盡量忍住不要馬上升級，多等個幾天觀察到到看看有沒有災情，歷史上就曾發生幾次發佈新版本之後，因為發現嚴重問題，隔一天又發佈下一個版本的糟糕記錄(2.0.0-&gt;2.0.1只隔了一天, 2.3.6-&gt;2.3.7-&gt;2.3.8都只隔了一天，3.0.8-&gt;3.0.9隔了一天)。升級前做好功課，了解有哪些變更、有沒有哪些Gem套件有問題、佈署到 staging server 做測試，這些都是要做的。</p>
+
+<p>另一方面要注意的事情，就是平常開發就注意減低升級上的困難。如果你使用的是 Rails 核心 API，這些在升級文件中都會告訴你應該注意的事項。因此有困難的多半是 Gems和Plugin 的關係。 因此在使用 Plugin 上，我建議你 應該把焦點集中於你正在使用中的 plugin 的維護及更新狀況? 有很多人用嗎? 有人維護的套件，在 rails 發佈新版之後，就會有新的對應版本。另外，你熟悉這個套件嗎? 你看的懂這個 plugin 到底在做什麼事情嗎? 很多時候，我們其實不太需要太過 hack 的 plugin，用 monkey patch 的套件容易有問題、來路不明的 Plugin 也少碰為妙。減少不必要的 gem dependency 可以減低升級上的困難。</p>
+
+<h3 id='rubyists'>其他<em>Rubyists</em>的解答：</h3>
+
+<p>關於採用 Ruby 和 Rails 技術的常見疑慮，知名部落客<em>xdite</em>也有一場演講回答了這些常見問題，請參考：</p>
+
+<ul>
+<li><a href='http://blog.xdite.net/?p=2124'>Rapid Development with Rails 前言</a></li>
+
+<li><a href='http://blog.xdite.net/?p=2150'>Rapid Development with Rails 投影片</a></li>
+</ul>
+
+<p><em>ITeye</em>站長也有其見解：</p>
+
+<ul>
+<li><a href='http://robbin.iteye.com/blog/970047'>再談非主流工業語言</a></li>
+
+<li><a href='http://robbin.iteye.com/blog/972242'>從Rails聊聊小公司的研發團隊建設</a></li>
+</ul>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

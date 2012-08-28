@@ -1,0 +1,470 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | ActiveRecord</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/activerecord.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='activerecord'>ActiveRecord</h2>
+<div id='submenu'>
+<h3>本章目錄</h3>
+<ul>
+<li>ORM</li>
+<li>建立 Model</li>
+<li>觀看 Log</li>
+<li>基礎操作
+    <ul>
+    <li>如何新增</li>
+    <li>如何查詢</li>
+    <li>find_each 批次處理</li>
+    <li>重新載入</li>
+    <li>如何刪除</li>
+    <li>統計方法</li>
+    <li>如何更新</li>
+    </ul>
+</li>
+<li>Scopes 作用域</li>
+<li>自定 attribute 與資料庫互動</li>
+</ul>
+</div>
+<p>ActiveRecord 是 Rails 的 ORM 元件，負責與資料庫溝通，讓我們可以用物件導向的語法操作資料庫。在&#8221;打造 CRUD 應用程式&#8221;一章中提到的對應概念如下：</p>
+<ul>
+<li>將資料庫表格(table) 對應到一個類別(class)</li>
+<li>類別方法就是操作表格(table)</li>
+<li>將資料庫一列 (row) 對應到一個物件(object)</li>
+<li>物件方法就是操作個別的資料(row)</li>
+<li>將資料庫欄位(column) 對應到物件的屬性(object attribute)</li>
+</ul>
+<p>因此，資料庫裡面的資料表，我們用一個 Model 類別來表示，而其中的一筆資料，就是一個 Model 物件。</p>
+
+<blockquote>
+<p>ActiveRecord 這個函式庫實作了 Martin Fowler 的 Active Record 設計模式(Design Pattern) <a href='http://martinfowler.com/eaaCatalog/activeRecord.html'>http://martinfowler.com/eaaCatalog/activeRecord.html</a></p>
+</blockquote>
+
+<h3 id='orm_'>ORM 與抽象滲漏法則</h3>
+
+<p>ORM (Object-relational mapping ) 是一種對映設關聯式資料與物件資料的程式技術。物件導向和從數學理論發展出來的關聯式資料庫，有著顯著的區別，而 ORM 正是解決這個不匹配問題所產生的工具。它可以讓你使用物件導向語法來操作關聯式資料庫，非常容易使用、撰碼十分有效率，不需要撰寫繁瑣的SQL語法，同時也增加了程式碼維護性。</p>
+
+<p>不過，有些熟悉 SQL 語法的程式設計師反對使用這樣的機制，因為直接撰寫 SQL 可以確保操作資料庫的執行效率，畢竟有些時候 ORM 產生出來的 SQL 效率不是最佳解，而你卻不一定有經驗能夠意識到什麼時候需要擔心或處理這個問題。</p>
+
+<p>知名軟體人 Joel Spolsky (他有兩本中文翻譯書值得推薦：約耳趣談軟體和約耳續談軟體，悅知出版) 有個理論：<a href='http://local.joelonsoftware.com/wiki/The_Joel_on_Software_Translation_Project:%E6%8A%BD%E8%B1%A1%E6%BB%B2%E6%BC%8F%E6%B3%95%E5%89%87'>抽象滲漏法則</a>：所有重大的抽象機制在某種程式上都是有漏洞的。有非常多程式設計其實都是在建立抽象機制，C 語言簡化了組合組言的繁雜、動態語言如 Ruby 簡化了 C 語言、TCP 協定簡化了 IP 通訊協定，甚至車子的擋風玻璃跟雨刷也簡化了下雨的事實。</p>
+
+<p>但是這些抽象機制或多或少都會力有未及的地方，用 C 語言撰寫的 Linux 核心也包括少量組合語言、部分 Ruby 套件用 C 語言撰寫擴充來增加效能、保證訊息會抵達 TCP 訊息，碰到 IP 封包在路由器上隨機遺失的時候，你也只會覺得速度很慢、即使有擋風玻璃跟雨刷，開車還是必須小心路滑。</p>
+
+<p>當某人發明一套神奇可以大幅提升效率的新程式工具時，就會聽到很多人說：「應該先學會如何手動進行，然後才用這個神奇的工具來節省時間。」任何抽象機制都有漏洞，而唯一能完美處理漏洞的方法，就是只去弄懂該抽象原理以及所隱藏的東西。這是否表示我們應該永遠只應該使用比較低階的工具呢？不是這樣的。而是應該依照不同的情境，選擇效益最大的抽象化工具。以商務邏輯為多的 Web 應用程式，選擇動態語言開發就相對合適，用 C 語言開發固然執行效率極高，但是完成相同的功能卻需要極高的人月開發時數。如果是作業系統，使用無法隨意控制記憶體分配的動態語言也顯然不是個好主意。</p>
+
+<p>能夠意識到什麼時候抽象化工具會產生滲漏，正是&#8221;有純熟經驗&#8221;的程式設計師和&#8221;新手&#8221;設計師之間的差別。ORM 雖然替我們節省了工作的時間，不過對資深的程式設計師來說，學習 SQL 的時間還是省不掉的。這一切都似乎表示，即使我們擁有愈來愈高階的程式設計工具，抽象化也做得愈來愈好，要成為一個由高階到低階都純熟的程式設計專家是愈來愈困難了(也越來越稀有及寶貴)。</p>
+
+<h3 id='_model'>建立 Model</h3>
+
+<p>首先，讓我們示範如何建立一個 Model：</p>
+
+<pre><code>rails g model category</code></pre>
+
+<p>這個指令會產生幾個檔案</p>
+
+<pre><code>category.rb
+category_test.rb
+categories.yml
+xxxxxxxx_create_categories.rb</code></pre>
+
+<p>打開 xxxxxxxx_create_categories.rb 你可以看到資料表的定義，讓我們加上幾個欄位吧，除了建立<code>categiries</code>表，同時也幫<em>events</em>加上一個外部鍵讓兩個表可以關連起來，在後幾章會用到：</p>
+
+<pre><code>class CreateCategories &lt; ActiveRecord::Migration
+  def change
+    create_table :categories do |t|
+      t.string :name
+      t.integer :position
+      t.timestamps
+    end
+    
+    add_column :events, :category_id, :integer
+    add_index :events, :category_id
+  end
+end</code></pre>
+
+<p>接著執行以下指令便會產生出資料庫資料表</p>
+
+<pre><code>bundle exec rake db:migrate</code></pre>
+
+<p>db:migrate 指令會將上述的 Ruby 程式變成以下 SQL 執行。</p>
+
+<pre><code>CREATE TABLE categories (
+&quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+&quot;name&quot; varchar(255) DEFAULT NULL,
+&quot;position&quot; int(4) DEFAULT NULL,
+&quot;created_at&quot; datetime DEFAULT NULL,
+&quot;updated_at&quot; datetime DEFAULT NULL);    </code></pre>
+
+<p>接著我們打開 category.rb 你可以看到</p>
+
+<pre><code>class Category &lt; ActiveRecord::Base
+end</code></pre>
+
+<p>這是一個繼承 ActiveRecord::Base 的 Category 類別。</p>
+
+<p>我們在學習 Ruby 的時候提過 irb 這個互動工具，而 Rails 也提供了特殊的 irb 介面叫做 console，讓我們可以直接與 Rails 程式互動：</p>
+
+<pre><code>rails console (可以簡寫成 rails c)</code></pre>
+
+<p>透過 console，我們可以輕易的練習操作 ActiveRecord。</p>
+
+<h3 id='_log'>觀看 Log</h3>
+
+<p>不像 rails server 可以直接看到 log，在 Rails 主控台下必須透過觀察 log 檔案。我們可以透過 log 觀察到 Rails 產生出來的 SQL 長的如何。</p>
+
+<pre><code>tail -f log/development.log</code></pre>
+
+<blockquote>
+<p>Windows 上沒有這個指令，可以安裝 <a href='http://tailforwin32.sourceforge.net/'>Tail for Win32</a> 這個工具來即時觀察 log 檔案。或是安裝 <a href='http://unxutils.sourceforge.net/'>GNU utilities for Win32</a> 來獲得 tail 指令。</p>
+</blockquote>
+
+<h3 id='id108'>基礎操作</h3>
+
+<h4 id='id109'>如何新增</h4>
+
+<p><em>ActiveRecord</em>提供了四種<em>API</em>，分別是save、save!、create和create!：</p>
+
+<pre><code>a = Category.new( :name =&gt; &#39;Ruby&#39;, :position =&gt; 1 )
+a.save
+
+b = Category.new( :name =&gt; &#39;Perl&#39;, :position =&gt; 2 )
+b.save!
+        
+Category.create( :name =&gt; &#39;Python&#39;, :position =&gt; 3 )
+c = Category.create!( :name =&gt; &#39;PHP&#39;, :position =&gt; 4 )</code></pre>
+
+<p>其中<em>create</em>和<em>create!</em>就等於<code>new</code>完就<em>save</em>和<em>save!</em>，有無驚嘆號的差別在於<em>validate</em>資料驗證不正確的動作，無驚嘆號版本會回傳布林值(true或false)，有驚嘆號版本則是驗證錯誤會丟出例外。</p>
+
+<p>何時使用驚嘆號版本呢?save和create通常用在會處理回傳布林值(true/false)的情況下(例如在 controller 裡面根據成功失敗決定 render 或 redirect)，否則在預期應該會儲存成功的情況下，請用 save!或create! 來處理，這樣一旦碰到儲存失敗的情形，才好追蹤 bug。</p>
+
+<p>透過 :validate =&gt; false 可以略過驗證</p>
+
+<pre><code>c.save( :validate =&gt; false )</code></pre>
+
+<blockquote>
+<p>在 Rails3 之前的版本是 user.save(false)</p>
+</blockquote>
+
+<h4 id='id110'>如何查詢</h4>
+
+<p>ActiveRecord 使用了 Arel 技術來實作查詢功能，你可以自由組合 where、limit、select、order 等條件。</p>
+
+<blockquote>
+<p>Arel 是 relational algebra” library。但根據 2.0 實作者 tenderlove 的說法，也可以說是一種 SQL compiler。 http://engineering.attinteractive.com/2010/12/architecture-of-arel-2-0/</p>
+</blockquote>
+
+<h6 id='first_last__all'>first, last 和 all</h6>
+
+<p>這三個方法可以分別拿出資料庫中的第一筆、最後一筆及全部的資料：</p>
+
+<pre><code>c1 = Category.first
+c2 = Category.last
+categories = Category.all # 這會是一個陣列</code></pre>
+
+<blockquote>
+<p>如果資料量較多，請不要在正式上線環境中執行.all 把所有資料拿出來，這樣會耗費非常多的記憶體。請用分頁或縮小查詢範圍。</p>
+</blockquote>
+
+<h6 id='find'>find</h6>
+
+<p>已知資料的主鍵 ID 的值的話，可以使用 find 方法：</p>
+
+<pre><code>c3 = Category.find(1)
+c4 = Category.find(2)</code></pre>
+
+<p>find 也可以接受陣列參數，這樣就會一次找尋多個並回傳陣列：</p>
+
+<pre><code>arr = Category.find([1,2])
+# 或是
+arr = Category.find(1,2)</code></pre>
+
+<blockquote>
+<p>如果找不到資料的話，會丟 ActiveRecord::RecordNotFound 例外。如果是 find_by_id 就不會丟出例外，而是回傳 nil。</p>
+</blockquote>
+
+<h6 id='find_by___find_all_by_'>find_by_* 和 find_all_by_*</h6>
+
+<p>find_by_* 和 find_all_by_* 是 Rails 的動態方法，可以自由用 and 組合，例如：</p>
+
+<pre><code>c5 = Category.find_by_name(&#39;Ruby&#39;)
+c6 = Category.find_by_name_and_position(&#39;Ruby&#39;, 1)
+c7 = Category.find_all_by_position(2)</code></pre>
+
+<h6 id='find_by_sql'>find_by_sql</h6>
+
+<p>如果需要手動撰寫 SQL，可以使用 find_by_sql，例如：</p>
+
+<pre><code>c8 = Category.find_by_sql(&quot;select * from categories&quot;)</code></pre>
+
+<p>不過在絕大多數的情況，是不需要手動寫 SQL 的。</p>
+
+<h6 id='where_'>where 查詢條件</h6>
+
+<p>where 可以非常彈性的組合出 SQL 查詢，例如：</p>
+
+<pre><code>c9 = Category.where( :name =&gt; &#39;Ruby&#39;, :position =&gt; 1 )
+c10 = Category.where( [ &quot;name = ? or position = ?&quot;, &#39;Ruby&#39;, 2] )</code></pre>
+
+<p>其中參數有兩種寫法，一種是 Hash，另一種是 Array。前者的寫法雖然比較簡潔，但是就沒辦法寫出 or 的查詢。注意到不要使用字串寫法，例如</p>
+
+<pre><code>Category.where(&quot;name = #{params[:name]}&quot;) # 請不要這樣寫</code></pre>
+
+<p>這是因為字串寫法會有 SQL injection 的安全性問題，請改用陣列寫法。</p>
+
+<p>另外，where 是 lazy loading，也就是直到真的需要取值的時候，才會跟資料庫拿資料。如果需要立即觸發，可以接著使用 .all, .first, .last，例如</p>
+
+<pre><code>c11 = Category.where( :name =&gt; &#39;Ruby&#39;, :position =&gt; 1 ).all</code></pre>
+
+<h4 id='limit'>limit</h4>
+
+<p>limit 可以限制筆數</p>
+
+<pre><code>c = Category.limit(5).all
+c.size # 5</code></pre>
+
+<h4 id='order'>order</h4>
+
+<p>order 可以設定排序條件</p>
+
+<pre><code>Category.order(&quot;position&quot;)
+Category.order(&quot;position DESC&quot;)
+Category.order(&quot;position DESC, name ASC&quot;)</code></pre>
+
+<p>如果要消去<em>order</em>條件，可以用<code>reorder</code>：</p>
+
+<pre><code>Category.order(&quot;position&quot;).reorder(&quot;name&quot;) # 改用 name 排序
+Category.order(&quot;position&quot;).reorder(nil) # 取消所有排序</code></pre>
+
+<h4 id='offset'>offset</h4>
+
+<p>offset 可以設定忽略前幾筆不取出，通常用於資料分頁：</p>
+
+<pre><code>c = Category.limit(2)
+c.first.id # 1
+Category.limit(2).offset(3)
+c.first.id # 4</code></pre>
+
+<h4 id='select'>select</h4>
+
+<p>預設的 SQL 查詢會取出資料的所有欄位，有時候你可能不需要所有資料，為了效能我們可以只取出其中特定欄位：</p>
+
+<pre><code>Category.select(&quot;id, name&quot;)</code></pre>
+
+<blockquote>
+<p>例如欄位中有 Binary 資料時，你不會希望每次都讀取出龐大的 Binary 資料佔用記憶體，而只希望在使用者要下載的時候才讀取出來。</p>
+</blockquote>
+
+<h4 id='readonly'>readonly</h4>
+
+<pre><code>c = Category.readonly.first</code></pre>
+
+<p>如此查詢出來的<code>c</code>就無法修改或刪除，不然會丟出<code>ActiveRecord::ReadOnlyRecord</code>例外。</p>
+
+<h4 id='group__having'>group 和 having</h4>
+
+<p>(TODO)</p>
+
+<h4 id='id111'>串接寫法</h4>
+
+<p>以上的 where, order , limit, offset, joins, select 等等，都可以自由串接起來組合出最終的 SQL 條件：</p>
+
+<pre><code>c12 = Category.where( :name =&gt; &#39;Ruby&#39; ).order(&quot;id desc&quot;).limit(3)</code></pre>
+
+<h4 id='find_each_'>find_each 批次處理</h4>
+
+<p>如果資料量很大，但是又需要全部拿出來處理，可以使用 find_each 批次處理</p>
+
+<pre><code>Category.where(&quot;position &gt; 1&quot;).find_each do |category|
+    category.do_some_thing
+end</code></pre>
+
+<p>預設會批次撈 1000 筆，如果需要設定可以加上 :batch_size 參數。</p>
+
+<h4 id='id112'>重新載入</h4>
+
+<p>如果已經讀取的 AR 資料，需要重新載入，可以用 reload 方法：</p>
+
+<pre><code>p = Category.first
+p.reload</code></pre>
+
+<h4 id='id113'>如何刪除</h4>
+
+<p>一種是先抓到該物件，然後刪除：</p>
+
+<pre><code>c12 = Category.first
+c12.destroy</code></pre>
+
+<p>另一種是直接對類別呼叫刪除，傳入 ID 或條件：</p>
+
+<pre><code>Category.delete(2)
+Category.delete_all(conditions = nil)
+Category.destroy_all(conditions = nil) </code></pre>
+
+<p>delete 不會有 callback 回呼，destroy 有 callback 回呼。什麼是回呼詳見下一章。</p>
+
+<h4 id='id114'>統計方法</h4>
+
+<pre><code>Category.count
+Category.average(:position)
+Category.maximum(:position)
+Category.sum(:position)</code></pre>
+
+<p>其中我們可以利用上述的 where 條件縮小範圍，例如：</p>
+
+<pre><code>Category.where( :name =&gt; &quot;Ruby&quot;).count</code></pre>
+
+<h4 id='id115'>如何更新</h4>
+
+<pre><code>c13 = Category.first
+c13.update_attributes(attributes)
+c13.update_attributes!(attributes)
+c13.update_attribute(attribute_name, value)</code></pre>
+
+<blockquote>
+<p>注意 update_attribute 會略過 validation 資料驗證 注意 mass assign 安全性問題，可以透過 attr_protected 或 attr_accessor 設定，詳見安全性一章。</p>
+</blockquote>
+
+<h3 id='scopes_'>Scopes 作用域</h3>
+
+<p><em>Model Scopes</em>是一項非常酷的功能，它可以將常用的查詢條件宣告起來，讓程式變得乾淨易讀，更厲害的是可以串接使用。例如，我們編輯<em>app/models/event.rb</em>，加上兩個<em>Scopes</em>：</p>
+
+<pre><code>class Event &lt; ActiveRecord::Base
+    scope :public, where( :is_public =&gt; true )
+    scope :recent_three_days, where([&quot;created_at &gt; ? &quot;, Time.now - 3.days ])
+end
+
+Event.create( :name =&gt; &quot;public event&quot;, :is_public =&gt; true )
+Event.create( :name =&gt; &quot;private event&quot;, :is_public =&gt; false )
+Event.create( :name =&gt; &quot;private event&quot;, :is_public =&gt; true )
+
+Event.public
+Event.public.recent_three_days</code></pre>
+
+<blockquote>
+<p>串接的順序沒有影響</p>
+</blockquote>
+
+<p>接著，我們可以設定一個預設的<em>Scope</em>，通常會拿來設定排序：</p>
+
+<pre><code>class Event &lt; ActiveRecord::Base    
+    default_scope order(&#39;id DESC&#39;)        
+end</code></pre>
+
+<p><code>unscoped</code>方法可以暫時取消預設的<em>default_scope</em>：</p>
+
+<pre><code>Event.unscoped do
+    Event.all
+    # SELECT * FROM events
+end</code></pre>
+
+<p>最後，<em>Scope</em>也可以接受參數，例如：</p>
+
+<pre><code>class Event &lt; ActiveRecord::Base
+    scope :recent, lambda{ |date| where([&quot;created_at &gt; ? &quot;, date ]) } 
+    # 或 scope :recent, Proc.new{ |t| where([&quot;created_at &gt; ? &quot;, t ]) }
+end
+
+Event.recent( Time.now - 7.days )</code></pre>
+
+<p>不過，筆者會推薦上述這種帶有參數的<em>Scope</em>，改成如下的類別方法，可以比較明確看清楚參數是什麼，特別是你想給預設值的時候：</p>
+
+<pre><code>class Event &lt; ActiveRecord::Base
+    def recent(t=Time.now)
+        where([&quot;created_at &gt; ? &quot;, t ])
+    end
+end
+
+Event.recent( Time.now - 7.days )</code></pre>
+
+<p>這樣的效果是一樣的，也是一樣可以和其他<em>Scope</em>做串接。</p>
+
+<p><code>scoped</code>方法可以將<em>Model</em>轉成可以串接的形式，方便依照參數組合出不同查詢，例如</p>
+
+<pre><code>fruits = Fruit.scoped
+fruits = fruits.where(:colour =&gt; &#39;red&#39;) if options[:red_only]
+fruits = fruits.limit(10) if limited?</code></pre>
+<!--
+TODO: unscoped, scoping, create_with
+<http://blog.plataformatec.com.br/2010/07/new-active-record-scoping-syntax/>
+-->
+<h3 id='virtual_attribute'>虛擬屬性(Virtual Attribute)</h3>
+
+<p>有時候表單裡操作的屬性資料，不一定和資料庫的欄位完全對應。例如資料表分成<em>first_name</em>和<em>last_name</em>兩個欄位好了，但是表單輸入和顯示的時候，只需要一個屬性叫做<em>full_name</em>，這時候你就可以在<em>model</em>裡面定義這樣的方法：</p>
+
+<pre><code>def full_name
+    &quot;#{self.first_name} #{self.last_name}&quot;
+end
+
+def full_name=(value)
+    self.first_name, self.last_name = value.to_s.split(&quot; &quot;, 2)  
+end</code></pre>
+
+<h3 id='id116'>更多線上資源</h3>
+
+<ul>
+<li>Active Record Query Interface <a href='http://guides.rubyonrails.org/active_record_querying.html'>http://guides.rubyonrails.org/active_record_querying.html</a></li>
+</ul>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

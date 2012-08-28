@@ -1,0 +1,260 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | Rails 錦囊妙計</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/rails-gems.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='rails_'>Rails 錦囊妙計</h2>
+<div id='submenu'>
+<h3>本章目錄</h3>
+<ul>
+<li>檔案處理</li>
+<li>HTTP Library</li>
+<li>YAML</li>
+<li>JSON</li>
+<li>XML</li>
+<li>PDF</li>
+<li>CSV</li>
+<li>套版</li>
+<li>分頁</li>
+<li>檔案上傳</li>
+<li>acts as 系列</li>
+<li>如何畫圖表</li>
+<li>有限狀態機</li>
+<li>Liquid</li>
+<li>ssl_requirement</li>
+<li>Recapache</li>
+<li>annotate_models</li>
+<li>delayed_job</li>
+<li>全文搜尋</li>
+<li>其他 ORM</li>
+</ul>
+</div>
+<p>這一章介紹一些常用的<em>RubyGem</em>套件。更多熱門套件可以參考 <a href='http://ruby-toolbox.com/'>http://ruby-toolbox.com/</a></p>
+
+<h3 id='id164'>處理檔案</h3>
+
+<p>Ruby 內建的 File 函式庫 <a href='http://ruby-doc.org/core/classes/File.html'>http://ruby-doc.org/core/classes/File.html</a></p>
+
+<h3 id='_http'>處理 HTTP</h3>
+
+<p>請參考 <a href='http://ihower.tw/blog/archives/2941'>HTTP client</a> 這篇文章。</p>
+
+<h3 id='yaml'>YAML</h3>
+
+<p>Rails 的資料庫設定檔 database.yml 是用一種叫 : <a href='http://www.yaml.org/'>YAML Ain&#8217;t Markup Language</a> 的格式所撰寫，檔案打開來，看起來就像一般的 plain 設定檔，非常容易修改。</p>
+
+<p>YAML 的設計首要目標就是要讓使用者容易看懂，可以和 script 語言搭配良好。用途有 資料序列化 data serialization、設定檔 configuration settings、log files、Internet messaging、filtering 等。網站上已知有支援的 script 語言有 Python,Ruby,Java,PHP,Perl,Javascript 等。</p>
+
+<pre><code>require ‘yaml’
+
+ps2 = YAML.load_file(‘example.yaml’)
+ps2.each do |it|
+  puts it.inspect
+end</code></pre>
+
+<h3 id='json'>JSON</h3>
+
+<p>Rails 內建就有 <a href='http://caboo.se/doc/classes/ActiveSupport/JSON.html'>ActiveSupport JSON</a>，用法如下：</p>
+
+<pre><code>ActiveSupport::JSON.encode( [ {:a =&gt; 1 , :b =&gt; 2 } , &quot;c&quot;, &quot;d&quot; ] )
+=&gt; &quot;[{\&quot;a\&quot;:1,\&quot;b\&quot;:2},\&quot;c\&quot;,\&quot;d\&quot;]&quot; 	
+
+ActiveSupport::JSON.decode( &quot;[{\&quot;a\&quot;:1,\&quot;b\&quot;:2},\&quot;c\&quot;,\&quot;d\&quot;]&quot; )
+=&gt; [{&quot;a&quot;=&gt;1, &quot;b&quot;=&gt;2}, &quot;c&quot;, &quot;d&quot;] </code></pre>
+
+<p><a href='http://github.com/brianmario/yajl-ruby'>Yajl-ruby</a> 則是一套底層用C，比較快的 JSON parser。</p>
+
+<p>如果要替換 Rails 內建的 JSON 函式庫，請在 config/application.rb 最下方加入：</p>
+
+<pre><code>ActiveSupport::JSON.backend = &#39;Yajl&#39;</code></pre>
+
+<h3 id='xml'>XML</h3>
+
+<p>Rails 內建使用 Ruby 的 XML 函式庫 <a href='http://builder.rubyforge.org/'>Builder</a></p>
+
+<p><a href='http://github.com/tenderlove/nokogiri'>Nokogiri</a> 是一套基於 <a href='http://xmlsoft.org/'>libxml2</a> 的函式庫，效能較佳。可參考 <a href='http://www.engineyard.com/blog/2010/getting-started-with-nokogiri/'>Getting Started with Nokogiri</a> 一文介紹用法。</p>
+
+<p>如果要替換 Rails 內建的 XML 函式庫，請在 config/application.rb 最下方加入：</p>
+
+<pre><code>ActiveSupport::XmlMini.backend = &#39;Nokogiri&#39;</code></pre>
+
+<h3 id='pdf'>PDF</h3>
+
+<p><a href='http://github.com/sandal/prawn'>Prawn</a> 可以產生 PDF，支援 Unicode。</p>
+
+<p><a href='http://thinkrelevance.com/blog/2010/06/15/rethinking-pdf-creation-in-ruby.html'>PDFKit</a> 則是另一個有趣的產生方式，透過 HTML/CSS 轉 PDF。</p>
+
+<h3 id='csv'>CSV</h3>
+
+<p><a href='http://fastercsv.rubyforge.org/'>FasterCSV</a> 是一套 pure Ruby 的 CSV 函式庫，也被 Ruby 1.9 納入內建。</p>
+
+<p><a href='http://www.toastyapps.com/excelsior/'>Excelsior</a> 則是一套底層用C實作，較快的 CSV 函式庫。</p>
+
+<blockquote>
+<p>YAML, JSON, XML, CSV 等都有底層改用 C 的函式庫，適合於正式上線環境，缺點是需要編譯，在一些特殊環境可能無法運作，例如最新版的 Nokogiri 就不支援 Windows 了。而純 Ruby 實作的版本就沒有這個問題。</p>
+</blockquote>
+
+<h3 id='id165'>套版</h3>
+
+<p><a href='http://github.com/pilu/web-app-theme'>Web App Theme</a> 是一套現成的免費的網頁 Theme。我們可以拿它的 stylesheet 來排版。</p>
+
+<p>例如：這是一個套好的 <a href='http://gist.github.com/537056'>app/views/layout/application.html.erb</a>，然後把 <a href='http://github.com/pilu/web-app-theme/tree/master/stylesheets/'>http://github.com/pilu/web-app-theme/tree/master/stylesheets/</a> 下的 base.css 和 themes/blue/style.css 放到 public/stylesheets/ 目錄下。</p>
+
+<h3 id='admin_'>Admin 介面</h3>
+
+<p><a href='http://www.viget.com/extend/rails-admin-interface-generators/'>http://www.viget.com/extend/rails-admin-interface-generators/</a></p>
+
+<ul>
+<li><a href='http://activeadmin.info/'>ActiveAdmin</a></li>
+
+<li><a href='https://github.com/sferik/rails_admin'>RailsAdmin</a></li>
+
+<li><a href='http://docs.typuscmf.com/en/atest/index.html'>Typus</a></li>
+</ul>
+
+<h3 id='id166'>表單</h3>
+
+<p>除了用<em>Rails</em>內建的表單<em>Helper</em>，也有一些提供表單設計更方便的套件：</p>
+
+<ul>
+<li><a href='https://github.com/plataformatec/simple_form'>simple_form</a></li>
+
+<li><a href='https://github.com/justinfrench/formtastic'>formtastic</a></li>
+</ul>
+
+<h3 id='id167'>分頁</h3>
+
+<ul>
+<li><a href='https://github.com/mislav/will_paginate'>will_paginate</a></li>
+
+<li><a href='https://github.com/amatsuda/kaminari'>kaminari</a></li>
+</ul>
+
+<h3 id='id168'>檔案上傳</h3>
+
+<p>有兩套選擇：</p>
+
+<ul>
+<li><a href='http://github.com/thoughtbot/paperclip'>Paperclip</a> 是目前使用上最為方便的檔案上傳 plugin。</li>
+
+<li><a href='https://github.com/jnicklas/carrierwave'>CarrierWave</a></li>
+</ul>
+
+<h3 id='acts_as_'>acts as 系列</h3>
+
+<p><a href='http://github.com/rails/acts_as_list'>ActsAsList</a> 幫 ActiveRecord 加上列表操作功能。 <a href='http://github.com/rails/acts_as_tree'>ActsAsTree</a> 幫 ActiveRecord 加上樹狀操作功能。 <a href='http://github.com/mbleigh/acts-as-taggable-on'>acts-as-taggable-on</a> 製作 Tag 功能。</p>
+
+<p><a href='http://asciicasts.com/episodes/262-trees-with-ancestry'>http://asciicasts.com/episodes/262-trees-with-ancestry</a></p>
+
+<h3 id='id169'>如何畫圖表</h3>
+
+<p>使用 <a href='http://googlecharts.rubyforge.org/'>GoogleCharts</a> 是最簡單的方式。 如果您使用 jQuery，<a href='http://code.google.com/p/flot/'>flot</a> 是一套不錯的圖表工具。</p>
+
+<h3 id='id170'>有限狀態機</h3>
+
+<p><a href='http://github.com/rubyist/aasm'>aasm</a></p>
+
+<h3 id='liquid'>Liquid</h3>
+
+<p><a href='http://www.liquidmarkup.org/'>liquid</a> 是一套如同 PHP Smarty 的樣版引擎。</p>
+
+<h3 id='ssl_requirement'>ssl_requirement</h3>
+
+<p><a href='http://github.com/rails/ssl_requirement'>ssl_requirement</a> 可以幫助您設定哪些頁面只能只用 HTTPS 或 HTTP 連線。</p>
+
+<h3 id='recapache'>Recapache</h3>
+
+<p><a href='http://github.com/ambethia/recaptcha'>Recaptcha</a> 是做 captcha 最簡單快速的方式。</p>
+
+<h3 id='annotate_models'>annotate_models</h3>
+
+<p><a href='http://github.com/ctran/annotate_models'>AnnotateModels</a> 可以幫助您將資料庫格式註解在 model 檔案中。</p>
+
+<h3 id='delayed_job'>delayed_job</h3>
+
+<p><a href='http://github.com/collectiveidea/delayed_job'>DelayedJob</a> 非同步排程 message queue</p>
+
+<h3 id='id171'>全文搜尋</h3>
+
+<p>請參考效能與快取一章的全文搜尋一節。</p>
+
+<h3 id='_orm'>其他 ORM</h3>
+
+<p>除了 ActiveRecord，你也可以考慮使用</p>
+
+<ul>
+<li>http://datamapper.org/</li>
+
+<li>http://mongoid.org/ 使用 MongoDB，所以應該叫 ODM</li>
+</ul>
+
+<h3 id='id172'>其他</h3>
+
+<p><a href='http://asciicasts.com/episodes/255-undo-with-papertrail'>http://asciicasts.com/episodes/255-undo-with-papertrail</a></p>
+
+<p><a href='http://intridea.com/2011/5/13/rails3-gems'>http://intridea.com/2011/5/13/rails3-gems</a></p>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

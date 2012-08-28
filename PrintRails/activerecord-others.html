@@ -1,0 +1,197 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | ActiveRecord 進階功能</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/activerecord-others.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='activerecord_'>ActiveRecord 進階功能</h2>
+<div id='submenu'>
+<h3>本章目錄</h3>
+<ul>
+<li>單一表格繼承 STI</li>
+<li>Serialize</li>
+<li>Dirty Objects</li>
+<li>Polymorphic Associations</li>
+<li>Observers</li>
+<li>Transactions</li>
+<li>其他</li>
+</ul>
+</div>
+<p>本章介紹其他<em>ActiveRecord</em>的常用進階功能。</p>
+
+<h3 id='stisingletable_inheritance'>單一表格繼承<em>STI(Single-table inheritance)</em></h3>
+
+<p>如何將物件導向中的繼承概念，對應到關聯式資料庫的設計，是個大哉問。<em>Rails</em>內建了其中最簡單的一個解法，只用一個資料表儲存繼承體系中的物件，搭配一個<code>type</code>欄位用來指名這筆資料的類別名稱。</p>
+
+<p>要開啟<em>STI</em>功能，依照慣例只要有一個欄位叫做<code>type</code>，型態字串即可。假設以下的<code>posts</code>資料表有欄位叫做<code>type</code>，那麼這三個<em>Models</em>實際上就會共用<code>posts</code>一個資料表，當然，還有這兩個子類別也都繼承到父類別的<code>validates_presence_of :subject</code>：</p>
+
+<pre><code>class Post &lt; ActiveRecord::Base
+    validates_presence_of :subject
+end
+
+class GuestPost &lt; Post
+end
+
+class MemberPost &lt; Post
+end</code></pre>
+
+<p>讓我們進入<em>rails console</em>實驗看看，<em>Rails</em>會根據你使用的類別，自動去設定<code>type</code>欄位：</p>
+
+<pre><code>post = GuestPost.create( :subject =&gt; &quot;guest&quot;)
+post.type # &quot;GuestPost&quot;
+post.id # 1
+post = MemberPost.create( :subject =&gt; &quot;member&quot; )
+post.id # 2
+post.type # &quot;MemberPost&quot;
+GuestPost.last # 1</code></pre>
+
+<blockquote>
+<p>很遺憾，也因為這個慣例的關係，你不能將<code>type</code>這麼名字挪做它用。</p>
+</blockquote>
+
+<p><em>STI</em>最大的問題在於欄位的浪費，如果繼承體系中交集的欄位不多，那麼使用<em>STI</em>就會非常的浪費空間。如果有較多的不共用的欄位，筆者會建議不要使用這個功能，讓個別的類別有自己的資料表。要關閉<em>STI</em>，請父類別加上<code>self.abstract_class = true</code></p>
+
+<pre><code>class Post &lt; ActiveRecord::Base
+    self.abstract_class = true
+    validates_presence_of :subject
+end
+
+class GuestPost &lt; Post
+end
+
+class MemberPost &lt; Post
+end    </code></pre>
+
+<p>這裡的<em>GuestPost</em>和<em>MemberPost</em>就需要有自己的<em>Migrations</em>建立<em>guest_posts</em>和<em>member_posts</em>資料表。</p>
+
+<h3 id='serialize'>Serialize</h3>
+
+<p>(TODO)</p>
+
+<h3 id='observers'>Observers</h3>
+
+<p>(TODO) <a href='http://api.rubyonrails.org/classes/ActiveRecord/Observer.html'>API 文件</a></p>
+
+<h3 id='transactions'>交易<em>Transactions</em></h3>
+
+<p>(TODO) <a href='http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html'>API 文件</a></p>
+
+<h3 id='dirty_objects'>Dirty objects</h3>
+
+<p><em>Dirty Objects</em>功能可以追蹤<em>Model</em>的屬性是否有改變：</p>
+
+<pre><code>person = Person.find_by_name(&#39;Uncle Bob&#39;)
+person.changed?       # =&gt; false 沒有改變任何值
+
+# 讓我們來改一些值
+person.name = &#39;Bob&#39;
+person.changed?       # =&gt; true 有改變
+person.name_changed?  # =&gt; true 這個屬性有改變
+person.name_was       # =&gt; &#39;Uncle Bob&#39; 改變之前的值
+person.name_change    # =&gt; [&#39;Uncle Bob&#39;, &#39;Bob&#39;]
+person.name = &#39;Bill&#39;
+person.name_change    # =&gt; [&#39;Uncle Bob&#39;, &#39;Bill&#39;]
+
+# 儲存進資料庫
+person.save
+person.changed?       # =&gt; false 
+person.name_changed?  # =&gt; false
+
+# 看看哪些屬性改變了
+person.name = &#39;Bob&#39;
+person.changed        # =&gt; [&#39;name&#39;]
+person.changes        # =&gt; { &#39;name&#39; =&gt; [&#39;Bill&#39;, &#39;Bob&#39;] }</code></pre>
+
+<blockquote>
+<p>注意到<em>Model</em>資料一旦儲存進資料庫，追蹤記錄就重算消失了。</p>
+</blockquote>
+
+<p>什麼時候會用到這個功能呢?通常是在儲存進資料庫前的回呼、驗證或<em>Observer</em>中，你想根據修改了什麼來做些動作，這時候<em>Dirty Objects</em>功能就派上用場了。</p>
+
+<h3 id='polymorphic_associations'>Polymorphic Associations</h3>
+
+<p>多型關連可以讓一個 Model 不一定關連到某一個特定的 Model，例如一個 Comment model，我們可以透過 Polymorphic Associations 讓它 belongs_to 各種不同的 Models</p>
+
+<p>(TODO)</p>
+
+<h3 id='id102'>其他</h3>
+
+<ul>
+<li>Composing</li>
+
+<li>Locking</li>
+
+<li>SecurePassword</li>
+</ul>
+
+<p>(TODO)</p>
+
+<h3 id='id103'>更多線上資源</h3>
+
+<ul>
+<li>Active Record Query Interface <a href='http://guides.rubyonrails.org/active_record_querying.html'>http://guides.rubyonrails.org/active_record_querying.html</a></li>
+</ul>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

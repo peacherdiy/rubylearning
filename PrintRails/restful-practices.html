@@ -1,0 +1,674 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | RESTful 與表單設計</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/restful-practices.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='restful_'>RESTful 與表單設計</h2>
+<div id='submenu'>
+<h3>本章目錄</h3>
+<ul>
+<li>一對多 Resources
+    <ul>
+    <li>案例一: 設計一個 event has_many :attendees</li>
+    <li>案例二: 讓 event 可以用 select 單選一個 category</li>
+    <li>案例三: 可以在 event 的表單新增、編輯頁面，直接新增或編輯 attendees (Nested Model Form)</li>
+    </ul>
+</li>    
+<li>一對一 Resource
+    <ul>
+    <li>案例一：新增一個 Map model，可以設定 event 的 map</li>
+    <li>案例二: (用 Nested Model Form)</li>
+    </ul>
+</li>
+<li>多對多 Resources
+    <ul>
+    <li>案例一： 在 event_groupships 的 new 中，選擇任一個 event 跟任一個 group 建立關係</li>
+    <li>案例二： 在 event new/edit 中, 可以使用 checkbox 多選 group</li>
+    <li>案例三： 使用 http://asciicasts.com/episodes/258-token-fields </li>
+    </ul>
+</li>
+<li>操作 Resources 狀態 (Resource 不一定對應 Model，可以對應一個概念)
+    <ul>
+    <li>案例：設計一個 event_state resource, 可以開關 event 狀態</li>
+    </ul>
+</li>    
+<li>客製 Resources (collection)
+    <ul>
+    <li>案例：可以依據關鍵字搜尋 event</li>
+    </ul>
+</li>    
+<li>客製 Resources (member)
+    <ul>
+    <li>案例：新增 event dashboard 頁面</li>
+    </ul>
+</li>    
+<li>不需要設定 Resources 的情形
+    <ul>
+    <li>案例：讓 event index 可以依照參數排序</li>
+    <li>案例：搜尋 event</li>
+    </ul>
+</li>    
+<li>Namespace Resources
+    <ul>
+    <li>案例：新增 event 的管理後台</li>
+    </ul>
+</li>
+</ul>
+</div>
+<p>我們在<a href='activerecord-relationships.html'>ActiveRecord 資料表關係</a>一章學習了資料庫關連，那麼搭配 RESTful 路由要怎麼設計 controller 及表單呢? 我們在這裡將綜合前幾章所學，來實作各種形式的 Resource 模型。</p>
+
+<h3 id='_resources'>一對多 Resources</h3>
+
+<h4 id='__event_has_many_attendees'>案例一: 設計一個 event has_many :attendees</h4>
+
+<p>可以瀏覽個別 event 有哪些 attendees, 並可以 CRUD。請修改 config/routes.rb 為</p>
+
+<pre><code>resources :events do
+  resources :attendees, :controller =&gt; &#39;event_attendees&#39;
+end</code></pre>
+
+<p>執行以下指令產生 controller 檔案</p>
+
+<pre><code>rails g controller event_attendees</code></pre>
+
+<p>編輯 app/controllers/event_attendees_controller.rb，插入如下內容:</p>
+
+<pre><code>before_filter :find_event
+			
+def index
+  @attendees = @event.attendees
+end
+
+def show
+  @attendee = @event.attendees.find( params[:id] )
+end
+
+def new
+  @attendee = @event.attendees.build
+end
+
+def create
+  @attendee = @event.attendees.build( params[:attendee] )
+  if @attendee.save
+    redirect_to event_attendees_url( @event )
+  else
+    render :action =&gt; :new
+  end
+end
+
+def edit
+  @attendee = @event.attendees.find( params[:id] )
+end
+
+def update
+  @attendee = @event.attendees.find( params[:id] )
+  
+  if @attendee.update_attributes( params[:attendee] )
+    redirect_to event_attendees_url( @event )
+  else
+    render :action =&gt; :new
+  end
+    
+end
+
+def destroy
+  @attendee = @event.attendees.find( params[:id] )
+  @attendee.destroy
+  
+  redirect_to event_attendees_url( @event )
+end
+
+protected
+
+def find_event
+  @event = Event.find( params[:event_id] )
+end				</code></pre>
+
+<p>編輯 app/views/events/index.html.erb，在迴圈中加入</p>
+
+<pre><code>&lt;%= link_to &#39;attendees&#39;, event_attendees_path(event) %&gt;		</code></pre>
+
+<p>編輯 app/views/event_attendees/index.html.erb</p>
+
+<pre><code>&lt;ul&gt;
+&lt;% @attendees.each do |attendee| %&gt;
+	&lt;li&gt;
+	  &lt;%= attendee.name %&gt;
+	  &lt;%= link_to &#39;show&#39;, event_attendee_path(@event, attendee) %&gt;
+	  &lt;%= link_to &#39;edit&#39;, edit_event_attendee_path(@event, attendee) %&gt;
+	  &lt;%= link_to &#39;destroy&#39;, event_attendee_path(@event, attendee), 
+	                            :method =&gt; :delete %&gt;
+	&lt;/li&gt;
+&lt;% end %&gt;
+
+&lt;/ul&gt;
+
+	  &lt;%= link_to &#39;new attendee&#39;, new_event_attendee_path(@event) %&gt;</code></pre>
+
+<p>編輯 app/views/event_attendees/show.html.erb</p>
+
+<pre><code>&lt;p&gt;&lt;%= @attendee.name %&gt; &lt;/p&gt;</code></pre>
+
+<p>編輯 app/views/event_attendees/new.html.erb</p>
+
+<pre><code>&lt;%= form_for @attendee, :url =&gt; event_attendees_path(@event) do |f| %&gt;
+   &lt;%= f.text_field :name %&gt;
+   &lt;%= f.submit %&gt;
+&lt;% end %&gt;</code></pre>
+
+<p>編輯 app/views/event_attendees/edit.html.erb</p>
+
+<pre><code>&lt;%= form_for @attendee, :url =&gt; event_attendee_path(@event, @attendee), :html =&gt; { :method =&gt; :put } do |f| %&gt;
+   &lt;%= f.text_field :name %&gt;
+   &lt;%= f.submit %&gt;
+&lt;% end %&gt;</code></pre>
+
+<h4 id='__event__select__category'>案例二: 讓 event 可以用 select 單選一個 category</h4>
+
+<p>首先新增一個 Category model</p>
+
+<pre><code>rails g model category name:string</code></pre>
+
+<p>然後我們需要讓 Event model 多一個欄位是 category_id</p>
+
+<pre><code>rails g migration add_category_id_to_event</code></pre>
+
+<p>然後編輯這個 migration 檔案 /db/migrate/XXXX_add_category_id_to_event 新增欄位。編輯好後執行 rake db:migrate。</p>
+
+<pre><code>class AddCategoryIdToEvent &lt; ActiveRecord::Migration
+  def self.up
+    add_column :events, :category_id, :integer
+  end
+
+  def self.down
+    remove_column :event, :category_id
+  end
+end</code></pre>
+
+<p>編輯 app/models/event.rb 加上關連:</p>
+
+<pre><code>class Event &lt; ActiveRecord::Base
+    belongs_to :category
+end</code></pre>
+
+<p>編輯 app/models/category.rb 加上關連</p>
+
+<pre><code>class Category &lt; ActiveRecord::Base
+    has_many :events
+end</code></pre>
+
+<p>首先，我們需要先建立一些 Category 的資料，進入 rails console 輸入：</p>
+
+<pre><code>Category.create( :name =&gt; &quot;Course&quot; )
+Category.create( :name =&gt; &quot;Meeting&quot; )
+Category.create( :name =&gt; &quot;Conference&quot; )</code></pre>
+
+<p>接著編輯 app/views/events/_form.html.erb 這個樣板，讓我們來加上一個下拉選單。在表單中加入：</p>
+
+<pre><code>&lt;%= f.select :category_id, Category.all.map{ |c| [c.name, c.id] } %&gt;</code></pre>
+
+<p>如此就會出現下拉選單了。讓我們來修改 app/views/events/show.html.erb 可以顯示出 category 的名字：</p>
+
+<pre><code>&lt;p&gt;Category: &lt;%= @event.category.name %&gt;&lt;p&gt;</code></pre>
+
+<blockquote>
+<p>不過 @event.category 可能是 nil，這會導致 nil.name 發生錯誤。一個簡單的方式是改使用 @event.category.try(:name)，另一招則是在 Event model 加入以下程式，就會有 @event.category_name 可以使用，而且允許 @event.category 是 nil</p>
+</blockquote>
+
+<pre><code>delegate :name, :to =&gt; :category, :prefix =&gt; true, :allow_nil =&gt; true</code></pre>
+
+<p>如此便完成了。不過，上述的下拉選單程式不是很漂亮，我們不應該在 View 放太多邏輯操作。讓我們改寫成一個 Helper，編輯 app/helpers/events_helper.rb</p>
+
+<pre><code>module EventsHelper
+    def category_options
+        Category.all.map{ |c| [c.name, c.id] }
+    end
+end</code></pre>
+
+<p>如此 View 就可以改寫成<code>&lt;%= f.select :category_id, category_options %&gt;</code></p>
+
+<h4 id='__event__attendees'>案例三: 可以在 event 的表單新增、編輯頁面，直接新增或編輯 attendees</h4>
+
+<p>請參考 Nested Model Form Part 1 <a href='http://asciicasts.com/episodes/196-nested-model-form-part-1'>http://asciicasts.com/episodes/196-nested-model-form-part-1</a> 和 Nested Model Form Part 2 <a href='http://asciicasts.com/episodes/197-nested-model-form-part-2'>http://asciicasts.com/episodes/197-nested-model-form-part-2</a> 這兩篇文章</p>
+
+<h3 id='_resource'>一對一 Resource</h3>
+
+<h4 id='location'>案例一：建立<em>Location</em>表單</h4>
+
+<p><a href='activerecord-relationships.html'>ActiveRecord 資料表關係</a>一章中，我們新增了<em>Location Model</em>和<em>Event Model</em>是一對一的關係，一個<em>Location</em>屬於一個<em>Event</em>，接下來讓我們來建立一個表單介面可以編輯<em>Location</em>：</p>
+
+<p>執行以下指令產生 controller 檔案</p>
+
+<pre><code>rails g controller event_locations</code></pre>
+
+<p>編輯<code>config/routes.rb</code>加上一個<code>Singular Resource</code>，因為一個<em>Event</em>只有一個<em>Location</em>，所以我們使用了單數<em>Resource</em>：</p>
+
+<pre><code>resources :events do
+    resource :location, :controller =&gt; &#39;event_locations&#39;
+end</code></pre>
+
+<p>注意到我們的<em>Controller</em>檔名還是複數，使用<em>RESTful</em>路由的<em>Controller</em>，無論在<code>config/routes.rb</code>中使用單數<em>resource</em>或複數<em>resources</em>形式，檔名一律都是複數。</p>
+
+<p>編輯<code>app/controllers/event_locations_controller.rb</code>:</p>
+
+<pre><code>class EventLocationsController &lt; ApplicationController
+  before_filter :find_event
+
+  def show
+    @location = @event.location
+  end
+
+  def new
+    @location = @event.build_location
+  end
+
+  def create
+    @location = @event.build_location( params[:location] )
+    if @location.save
+      redirect_to event_location_url( @event )
+    else
+      render :action =&gt; :new
+    end
+  end
+
+  def edit
+    @location = @event.location
+  end
+
+  def update
+    @location = @event.location
+
+    if @location.update_attributes( params[:location] )
+      redirect_to event_location_url( @event )
+    else
+      render :action =&gt; :new
+    end
+
+  end
+
+  def destroy
+    @location = @event.location
+    @location.destroy
+
+    redirect_to event_location_url( @event )
+  end
+
+  protected
+
+  def find_event
+    @event = Event.find( params[:event_id] )
+  end
+end</code></pre>
+
+<p>因為是單數<em>resource</em>的關係，所以就沒有<em>index</em>這個<em>Action</em>了，也沒有<code>event_locations_path</code>和<code>event_location_path(event, location)</code>這種路由方法。</p>
+
+<p>編輯<em>app/views/events/index.html.erb</em>，在迴圈中加入</p>
+
+<pre><code>&lt;%= link_to &#39;location&#39;, event_location_path(event) %&gt;	</code></pre>
+
+<p>編輯<em>app/views/event_locations/show.html.erb</em></p>
+
+<pre><code>&lt;h1&gt;&lt;%= @event.name %&gt;&lt;/h1&gt;
+
+&lt;% if @event.location %&gt;
+  &lt;p&gt;&lt;%= @event.location.name %&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;%= link_to &quot;edit&quot;, edit_event_location_path(@event) %&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;%= link_to &quot;destroy&quot;, event_location_path(@event), :method =&gt; :delete %&gt;&lt;/p&gt;
+&lt;% else %&gt;
+  &lt;p&gt;N/A&lt;/p&gt;
+  &lt;p&gt;&lt;%= link_to &quot;Add location&quot;, new_event_location_path(@event) %&gt;&lt;/p&gt;
+&lt;% end %&gt;</code></pre>
+
+<p>編輯<em>app/views/event_locations/new.html.erb</em></p>
+
+<pre><code>&lt;%= form_for @location, :url =&gt; event_location_path(@event) do |f| %&gt;  
+  &lt;%= f.text_field :name %&gt;
+  &lt;%= f.submit %&gt;
+&lt;% end %&gt;</code></pre>
+
+<p>編輯<em>app/views/event_attendees/edit.html.erb</em></p>
+
+<pre><code>&lt;%= form_for @location, :url =&gt; event_location_path(@event), :method =&gt; :put do |f| %&gt;  
+  &lt;%= f.text_field :name %&gt;
+  &lt;%= f.submit %&gt;
+&lt;% end %&gt;</code></pre>
+
+<h4 id='_nested_model_'>案例二：用 Nested Model 順帶編輯跟新增</h4>
+
+<p>由於<em>Location</em>和<em>Event</em>是一對一關係，可以說<em>Location</em>是<em>Event</em>的附屬資料。因此我們也可以將<em>Location</em>的表單直接做在<em>Event</em>的表單裡，這樣<em>Location</em>甚至不需要自己的<em>Controller</em>了：</p>
+
+<p>編輯<em>app/models/event.rb</em>加上：</p>
+
+<pre><code>accepts_nested_attributes_for :location, :allow_destroy =&gt; true, :reject_if =&gt; :all_blank</code></pre>
+
+<p><code>accepts_nested_attributes_for</code>這個方法可以讓更新<em>event</em>資料時，也可以直接更新<em>location</em>的關聯資料。也就是說，我們可以完全不需要修改<em>events_controller</em>的新增和編輯<em>Action</em>，就可以透過本來的<code>params[:event]</code>參數來新增或修改<em>location</em>了。這裡有兩個特別的參數，<code>:allow_destroy</code>是說我們可以在表單中多放一個<code>_destroy</code>核選塊來表示刪除，而<code>:reject_if</code>表示說在什麼條件下，就當做沒有要真的動作，例如<code>:all_blank</code>就表示如果資料都是空的，就不建立<em>location</em>資料(當然也就不會檢查<em>location</em>的驗證了)。這是因為雖然要顯示<em>location</em>表單，但是不表示使用者一定要輸入。有輸入就表示必須通過<em>Location Model</em>的資料驗證。</p>
+
+<p>編輯<em>app/views/events/_form.html.erb</em>加上<em>Location</em>的表單，這裡使用了<code>fields_for</code>來達成嵌套表單：</p>
+
+<pre><code>&lt;%= f.fields_for :location do |location_form| %&gt;
+&lt;p&gt;
+&lt;%= location_form.label :name, &quot;Location Name&quot; %&gt;
+&lt;%= location_form.text_field :name %&gt;
+
+&lt;% unless location_form.object.new_record? %&gt;
+    &lt;%= location_form.label :_destroy, &#39;Remove:&#39; %&gt;
+    &lt;%= location_form.check_box :_destroy %&gt;
+&lt;% end %&gt;
+&lt;/p&gt;     
+&lt;% end %&gt;</code></pre>
+
+<p>編輯<em>app/helpers/events_helper.rb</em>新增一個<em>Helper</em>：</p>
+
+<pre><code>def setup_event(event)
+    event.build_location unless event.location
+    event
+end</code></pre>
+
+<p>我們會用<code>setup_event(@event)</code>來置換<code>form_for</code>中的<code>@event</code>，這是因為如果<code>@event.location</code>是<code>nil</code>的話，<em>Location</em>表單就完全不會顯示，所以假如沒有，就需要預先<code>build_location</code>给它。</p>
+
+<p>編輯<em>app/views/events/new.html.erb</em>：</p>
+
+<pre><code>&lt;%= form_for setup_event(@event), :url =&gt; events_path do |f| %&gt;</code></pre>
+
+<p>編輯<em>app/views/events.edit.html.erb</em>：</p>
+
+<pre><code>&lt;%= form_for setup_event(@event), :url =&gt; event_path(@event), :method =&gt; :put do |f| %&gt;</code></pre>
+
+<h3 id='_resources'>多對多 Resources</h3>
+
+<p><a href='activerecord-relationships.html'>ActiveRecord 資料表關係</a>一章中，我們新增了<em>EventGroupShip</em>這個<em>Model</em>作為<em>Event</em>和<em>Group</em>之間的<em>Joining table</em>，那麼要怎麼設計表單呢？</p>
+
+<h4 id='__event_newedit___checkbox__group'>案例一： 在 event new/edit 中, 可以使用 checkbox 多選 group</h4>
+
+<p>最常見的方式就是提供<em>check_box</em>核選方塊讓使用者可以勾選了，此例中我們打算在<em>event</em>的表單中放入<em>group</em>清單來做勾選。</p>
+
+<p>編輯<em>app/controller/events_controller.rb</em>的<em>new</em>和<em>edit Action</em>，加入：</p>
+
+<pre><code>@groups = Group.all</code></pre>
+
+<p>接著編輯<em>app/views/events/_form.html.erb</em></p>
+
+<pre><code>&lt;% @groups.each do |g| %&gt;    
+  &lt;%= check_box_tag &quot;event[group_ids][]&quot;, g.id, @event.groups.map(&amp;:id).include?(g.id) %&gt; &lt;%= g.name %&gt;
+&lt;% end %&gt;
+&lt;%= hidden_field_tag &#39;event[group_ids][]&#39;,&#39;&#39; %&gt;</code></pre>
+
+<p>這是因為<em>event</em>有<code>has_many :groups</code>的關係，所以可以透過屬性<code>group_ids</code>直接設定關連。這裡的<em>check_box_tag</em>送出的<code>event[group_ids]</code>是一個陣列。唯將<em>check box</em>都沒有核選時不會送出這個屬性，所以加上一個空值的隱藏欄位讓<em>Rails</em>可以移除關連。</p>
+
+<p>另外，建議可以看看<em>simple_form</em>這個<em>gem</em>，這個<em>gem</em>提供了全新的表單<em>Helpers</em>，有更強的功能可以直接對付關連性的資料。編輯<em>Gemfile</em>加上：</p>
+
+<pre><code>gem &quot;simple_form&quot;</code></pre>
+
+<p>接著執行<code>bundle</code>。我們需要完全改寫<em>app/views/events/_form.html.erb</em>：</p>
+
+<pre><code>&lt;%= simple_form_for(@event) do |f| %&gt;
+    &lt;%= f.input :name, :label =&gt; &quot;Event Name&quot; %&gt;
+    &lt;%= f.input :description, :as =&gt; :text, :label =&gt; &quot;Description&quot; %&gt;
+    &lt;%= f.association :groups, :as =&gt; :check_boxes, :label =&gt; &quot;Groups&quot; %&gt;
+    &lt;%= f.submit %&gt;
+&lt;% end %&gt;</code></pre>
+
+<p>完整的<em>simple_form API</em>請參考<a href='https://github.com/plataformatec/simple_form'>官方文件</a></p>
+
+<h4 id='__event_groupships__new__event__group_'>案例二： 在 event_groupships 的 new 中，選擇任一個 event 跟任一個 group 建立關係</h4>
+
+<p>我們也可以新增另外的表單專門來做關連，在此表單中有兩個<em>select</em>選單，分別選一個<em>event</em>和<em>group</em>，不過這種設計方式比較少見。</p>
+
+<h3 id='_resources_'>操作 Resources 狀態</h3>
+
+<h4 id='_event_states_resource__event_'>案例：設計一個 event_states resource, 可以開關 event 狀態</h4>
+
+<p><em>Resource</em>的概念不一定和<em>Model</em>是一對一的，其中的<em>Action</em>也不表示一定就是對應資料庫做<em>CRUD</em>操作。這裡我們來設計一個單數<em>resource</em>，對應的概念是開關<em>Event</em>狀態，例如<code>POST /events/123/state</code>表示將<em>Event</em>設定為開放、<code>DELETE /events/123/state</code>表示設定為關閉。</p>
+
+<p>首先，編輯<em>app/models/event.rb</em>加入幾個方法：</p>
+
+<pre><code>def closed?
+  self.status == &quot;CLOSED&quot;
+end
+
+def open?
+  !self.closed?
+end
+
+def open!
+  self.status = &quot;OPEN&quot;
+  self.save!
+end
+
+def close!
+  self.status = &quot;CLOSED&quot;
+  self.save!
+end</code></pre>
+
+<p>編輯<em>config/routes.rb</em>新增一個路由：</p>
+
+<pre><code>resources :events do
+    resource :state, :controller =&gt; &#39;event_states&#39;
+    # ...
+end</code></pre>
+
+<p>編輯<em>app/views/events/show.html.erb</em>，新增：</p>
+
+<pre><code>&lt;p&gt;Status: &lt;%= @event.status %&gt;&lt;/p&gt;
+
+&lt;p&gt;
+&lt;% if @event.closed? %&gt;
+    &lt;%= link_to &#39;[Open]&#39;, event_state_path(@event ), :method =&gt; :post %&gt;
+&lt;% else %&gt;
+    &lt;%= link_to &#39;[Close]&#39;, event_state_path(@event), :method =&gt; :delete %&gt;
+ &lt;% end %&gt;
+&lt;/p&gt;</code></pre>
+
+<p>新增<em>Controller</em>，輸入：</p>
+
+<pre><code>rails g controller event_states</code></pre>
+
+<p>編輯<em>app/controllers/event_states_controller.rb</em>：</p>
+
+<pre><code>class EventStatesController &lt; ApplicationController  
+  def create
+    Event.find(params[:event_id]).open!
+    redirect_to :back
+  end
+
+  def destroy
+    Event.find(params[:event_id]).close!
+    redirect_to :back
+  end  
+end</code></pre>
+
+<h3 id='_resources_collection'>客製 Resources (collection)</h3>
+
+<h4 id='_event'>案例：可以依據關鍵字搜尋 event</h4>
+
+<p>我們想要 events 除了 index 頁面之外，還有其他的頁面，例如根據搜尋結果來顯示所有 events。首先修改 routes.rb 在 events 的 resources 區塊中加入 collection 區塊，collection 表示這一個路由是針對 events 集合來操作：</p>
+
+<pre><code>resources :events do
+    collection do
+        get :search
+    end
+end</code></pre>
+
+<blockquote>
+<p>注意到在此 routes.rb 上請不要多一行 resources :events，這樣根據優先權會優先判斷成 events show action。</p>
+</blockquote>
+
+<p>這樣在 events_controller.rb 之中就可以多一個 action 叫做 search：</p>
+
+<pre><code>def search
+    @events = Event.where( [ &quot;name like ?&quot;, &quot;%#{params[:keyword]}%&quot; ]).paginate( :page =&gt; params[:page] )
+    render :action =&gt; :index
+end</code></pre>
+
+<p>我們在這裡寫 redner :action =&gt; :index 直接拿 index 的樣板來使用。</p>
+
+<blockquote>
+<p>SQL 的 like 查詢會比對資料表的所有資料，如果資料量很大效能影響很大，請改用全文搜尋機制。</p>
+</blockquote>
+
+<p>連結的 helper 是 search_events_path，例如我們可以在 app/views/events/index.html.erb 上方加入：</p>
+
+<pre><code>&lt;%= form_tag search_events_path, :method =&gt; :get do %&gt;
+    &lt;%= text_field_tag &quot;keyword&quot; %&gt;
+	&lt;%= submit_tag &quot;Search&quot; %&gt;
+&lt;% end %&gt;</code></pre>
+
+<p>這樣按下送出就會到 search action。</p>
+
+<h3 id='_resources_member'>客製 Resources (member)</h3>
+
+<h4 id='_event_dashboard_'>案例：新增 event dashboard 頁面</h4>
+
+<p>我們想要 event 除了 show 頁面之外，還有其他的頁面，例如 dashboard。首先修改 routes.rb 在 events 的 resources 區塊中加入 member 區塊，member 表示這一個路由是針對特定一個 event 來操作(必須傳入某一個 event)：</p>
+
+<pre><code>resources :events do
+    member do
+        get :dashboard
+    end
+end</code></pre>
+
+<p>這樣在 events_controller.rb 之中就可以多一個 action 叫做 dashboard：</p>
+
+<pre><code>def dashboard
+    @event = Event.find(params[:id])
+end</code></pre>
+
+<p>這個樣板檔案是 app/views/events/dashboard.html.erb，我們可以在這一頁提供不同於 index.html.erb 的內容。</p>
+
+<p>連結的 helper 是 dashboard_event_path(event)，例如我們可以在 app/views/events/index.html.erb 的迴圈中加入：</p>
+
+<pre><code>&lt;%= link_to &#39;Dashboard&#39;, dashboard_event_path(event) %&gt;</code></pre>
+
+<p>回過頭來看這種客製<em>member</em>路由，也可以說是一種<em>sub-resource</em>的簡化，等同於：</p>
+
+<pre><code>resoruces :events do
+    resource :dashboard
+end</code></pre>
+
+<p>然後這個<em>dashboard controller</em>只有一個<em>Action</em>叫做<em>show</em>。</p>
+
+<h3 id='_resources'>排序 Resources</h3>
+
+<h4 id='_event_index_'>案例：讓 event index 可以依照參數排序</h4>
+
+<p>這種情況我們可以不需要調整路由，用本來的 index action 根據參數就可以做到了。</p>
+
+<p>修改 events_controller.rb 的 index action：</p>
+
+<pre><code>def index
+  sort_by = (params[:order] == &#39;name&#39;) ? &#39;name&#39; : &#39;created_at&#39;
+  @events = Event.order(sort_by).paginate( :page =&gt; params[:page] )
+end</code></pre>
+
+<blockquote>
+<p>注意到我們必須先檢查 params[:order] 的內容，而不應該直接 order(params[:order])。這會導致有 SQL Injection 安全問題。</p>
+</blockquote>
+
+<p>在 index.html.erb 中加入排序的超連結：</p>
+
+<pre><code>&lt;%= link_to &#39;Sort by Name&#39;, events_path( :order =&gt; &quot;name&quot;) %&gt;
+&lt;%= link_to &#39;Sort by Default&#39;, events_path %&gt;</code></pre>
+
+<h3 id='namespace_resources'>Namespace Resources</h3>
+
+<h4 id='_event_'>案例：新增 event 的管理後台</h4>
+
+<p>原有的 events_controller 會作為前台一般使用者之用。為了後台管理用途，我們會另外再新增一個 controller 來操作 Event 這個 model</p>
+
+<pre><code>rails g controller admin::events</code></pre>
+
+<p>這樣會產生新的 controller 和 view，放在 admin 目錄下。而通常我們會讓 admin 管理後台的 layout 不同，以及加上使用者權限驗證，例如以下使用最簡單的 HTTP 驗證：</p>
+
+<pre><code>class Admin::EventsController &lt; ApplicationController
+
+    before_filter :authenticate
+    layout &quot;admin&quot;
+
+    # ....
+    
+    protected
+
+    def authenticate
+       authenticate_or_request_with_http_basic do |user_name, password|
+           user_name == &quot;username&quot; &amp;&amp; password == &quot;password&quot;
+       end
+    end
+    
+end</code></pre>
+
+<p>那路由要怎麼搭配呢? 編輯 routes.rb</p>
+
+<pre><code>namespace :admin do
+  resources :events
+end</code></pre>
+
+<p>這樣它的路由 Helper 就會是 admin_events_path 或 admin_event_path(event) 等</p>
+
+<h3 id='id173'>參考資料</h3>
+
+<p>http://ryandaigle.com/articles/2009/2/1/what-s-new-in-edge-rails-nested-attributes</p>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

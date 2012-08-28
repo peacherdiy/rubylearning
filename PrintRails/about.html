@@ -1,0 +1,135 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | 關於本書</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/about.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <div id='submenu'>
+    <h3><a href='author.html'>關於作者</a></h3>
+    <h3><a href='about.html'>關於本書</a></h3>
+    <h3><a href='faq.html'>常見問題</a></h3>
+    <h3><a href='ecosystem.html'>生態圈</a></h3>
+</div>
+<h2 id='id30'>關於本書</h2>
+
+<p>本書涵蓋了<em>Ruby on Rails</em>絕大部分的常用功能以及介紹，為了兼顧入門及實戰，本書拆分成兩個部分：<em>Part 1</em>前六章為入門導覽、<em>Part 2</em>深入剖析則包含中高階的內容。本書期許可以讓有經驗的網頁程式設計師，可以在本書中學習到<em>Rails</em>之道，將之實際應用在工作之中。</p>
+
+<blockquote>
+<p>Part 3: 核心擴充將另行發售。</p>
+</blockquote>
+
+<h3 id='id31'>軟體版本</h3>
+
+<p>本書使用的<em>Rails</em>版本是<em>3.2</em>，<em>Ruby</em>版本是<em>1.9.3</em>。本書出版後請參考本書網站以獲得最新相容性修改。</p>
+
+<h3 id='id32'>本書網站</h3>
+
+<p>你可以在<em><a href='http://ihower.tw/rails3'>http://ihower.tw/rails3</a></em>看到本書最新版本以及紙本勘誤。如果你有任何問題，也歡迎來信給我。</p>
+
+<p>範例程式碼則在<em><a href='https://github.com/ihower/rails3book-code'>https://github.com/ihower/rails3book-code</a></em>下載。</p>
+
+<h3 id='id33'>本書體例</h3>
+
+<p>為了避免讀者混淆指令的使用情境，區分如下：</p>
+<ul>
+<li>有錢號<code>$</code>開頭的是指命令列下的指令</li>
+<li>有大於<code>&gt;</code>開頭的是指在<code>rails console</code>主控台下的指令</li>
+<li>井號<code>#</code>是註解說明</li>
+<li>其他則是程式原始碼</li>
+</ul>
+<p>例如在以下的操作中，我們先輸入了<em>rails console</em>進入<em>Rails</em>的主控台，然後輸入<code>Person.first</code>和<code>Person.count</code>：</p>
+
+<p><img alt='Style screenshot' src='images/about-style-screenshot.png' /></p>
+
+<p>那麼在本書中，會這樣書寫：</p>
+
+<pre><code>$ rails console
+Loading development environment (Rails 3.1.0.rc4)
+&gt; Person.first # &lt;Person id: 1&gt;
+&gt; Person.count # 1 </code></pre>
+
+<h3 id='id34'>本書對象</h3>
+
+<p>本書主要對象為網站程式設計師，不適合完全沒有網頁開發經驗的朋友，在學習<em>Rails</em>前，您必須對以下知識有基本認識：</p>
+
+<ul>
+<li>物件導向程式設計，例如使用過<em>C++、Java、C#、PHP、Python、Perl</em>等</li>
+
+<li><em>HTML/CSS/JavaScript</em>等網頁設計基礎</li>
+
+<li>對網路通訊協定有基礎認識，例如<em>HTTP、DNS</em>等</li>
+
+<li>對<em>RDBMS</em>關聯式資料庫和<em>SQL</em>語法有基本了解</li>
+
+<li>熟悉指令列操作<em>(CLI: command line interface)</em>，<em>Unix-like</em>作業系統為佳</li>
+</ul>
+
+<p>如果您有<em>PHP/MySQL</em>或<em>ASP、JSP</em>等網頁應用程式開發經驗，相信這些對您應該不陌生。如果不清楚的話，您可以參考附錄補充這些知識。</p>
+
+<h3 id='id35'>致謝</h3>
+
+<p>本書起初的材料來源，來自於準備<em><a href='http://www.openfoundry.org/'>OSSF</a></em>主辦的<em>Ruby on Rails</em>工作坊課程，在這課程中獲得了教學相長的寶貴經驗，非常感謝中研院自由軟體鑄造場對於自由軟體和自由軟體社群的支持。本書在撰寫過程也收到非常多台灣和大陸讀者來信勘誤指教，就算只是問一個小問題或是鼓勵，也對這本書產生了良性回饋，在此也一併感謝你：<em>hSATAC、timloo0710、seekcalm、ETBlue、Michael Wang、liukai、inepalon、Ya-yu Huang、aiasfina、David Chuang、Yu-Yao Chang、yang thomas、inepalon、guan-ting chen、Eric.Xiong、pptpb.tw、saitoTK、le jerry、jeffchen1453、EvenWu、Jasper CAI、dreamy0909、JmeHsieh、逍遥、Mark GK、LiChun、tonytonyjan、Kang-Yu Li、曾小黑、Pomin Chen、jzg、ayaya、Juan Fatas、紅音也、Vincentzh、idarfan、lixing、雨蒼、jerrycheng、maxz、TaopaiC、Fukuball、klobo、liyq205、EIA ANG、caiguo、良葛格、Lam、Daniel Tsai、Hillman Yang、sdjcw13、Jingqiang、foxzool、gogojimmy</em>。</p>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

@@ -1,0 +1,304 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | 安裝 Ruby on Rails 開發環境</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/installation.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='rails'>安裝<em>Rails</em>開發環境</h2>
+<div id='submenu'>
+<h3>本章目錄</h3>
+<ul>
+<li>作業系統</li>
+<li>資料庫</li>
+<li>開發環境</li>
+<li>安裝Ruby及資料庫</li>
+<li>Rubygems簡介</li>
+<li>安裝Ruby on Rails</li>
+</ul>
+</div>
+<p>在這一章中，我們將介紹如何安裝<em>Ruby on Rails</em>的開發環境。開發<em>Rails</em>的環境需要：</p>
+
+<ul>
+<li><em>Ruby 1.8.7</em>、<em>1.9.2</em>以上版本或<em>JRuby</em>，本書使用<em>1.9.3</em>。</li>
+
+<li><em>RubyGems</em>，這是<em>Ruby</em>的套件管理系統，本書推薦<em>1.3.7</em>版或<em>1.8.10</em>以上。</li>
+
+<li>資料庫系統，本書推薦使用<em>SQLite</em>作為新手開發練習之用，正式環境則推薦<em>MySQL</em>或<em>PostgreSQL</em>。</li>
+
+<li><em>Ruby on Rails</em>，本書適用<em>3.2</em>版本。</li>
+</ul>
+
+<blockquote>
+<p>請注意<em>Rails 3</em>不支援<em>Ruby 1.9.1</em>這個版本。</p>
+</blockquote>
+
+<p><em>Ruby 1.9</em>系列和之前版本的最大的差異在於編碼的處理，例如：如果原始碼裡出現<em>UTF-8</em>中文，檔案第一行必須加上<code># encoding: utf-8</code> 標明，不然會出現<code>invalid multibyte char (US-ASCII)</code>的錯誤，這一點要特別注意。</p>
+
+<blockquote>
+<p><em><a href='http://jruby.org/'>JRuby</a></em>與<em>Ruby</em>最大的差異在於一些需要編譯的<em>RubyGem</em>套件：有些因為效能要求而用<em>C</em>語言撰寫的<em>RubyGem</em>在 <em>JRuby</em>上不一定能夠安裝使用。所幸這些多半都有替代的套件可以使用，但不在本書介紹範圍。</p>
+</blockquote>
+
+<p>以上差不多就是最基本的開發需求。如果需要部署到正式環境，則至少還需要一個專門的網站伺服器(<em>Apache</em>或<em>Nginx</em>等)，我們會在佈署一章再詳細說明。接下來我們會根據不同作業系統來說明如何安裝<em>Rails</em>開發環境。</p>
+
+<h3 id='id51'>作業系統</h3>
+
+<p><em>Ruby</em>可以運行在<em>Windows</em>、<em>Linux</em>、<em>Mac OS X</em>、<em>BSD</em>和<em>Solaris</em>上。雖然<em>Rails</em>可以在<em>Windows</em>上執行，但是有些套件只有支援<em>Unix-like</em>作業系統，以及<em>Ruby</em>程式在<em>Unix-like</em>系統上執行起來也比較快速及穩定。這是因為絕大多數的<em>Ruby</em>和<em>Rails</em>開發人員都是使用<em>Mac</em>和<em>Linux</em>系統。</p>
+
+<blockquote>
+<p><em>Unix-like</em>泛指各種傳統的<em>Unix</em>系統，比如<em>FreeBSD</em>、<em>OpenBSD</em>、<em>Solaris</em>，以及各種與<em>Unix</em>類似的系統，例如<em>Linux</em>、<em>Mac OS X</em>等等。有的是自由軟體，有的是商業軟體，但都相當程度地保留了原始<em>Unix</em>系統的特性，以及有許多相似之處。</p>
+</blockquote>
+
+<p>因此，<em>Rails</em>的正式上線環境中都會強烈建議使用<em>Unix-like</em>作業系統。作為開發人員，擁有良好使用者介面、底層又與<em>Unix</em>類似的<em>Mac</em>作業系統就變成了首選的開發平台，大部分的專業<em>Ruby</em>工作者，也都是使用<em>Mac</em>電腦。不過，使用<em>Windows</em>的朋友也別擔心，本書的內容一樣都適用，入門學習絕對沒問題。只是如果讀者的每日工作就是進行<em>Web</em>網站開發，那麼我會建議您考慮使用<em>Mac</em>系統或試試<em>Ubuntu Desktop</em>作業系統。和學習<em>Ruby</em>一樣，從 <em>Windows</em>轉換到<em>Mac</em>也是非常有趣的事情，可以獲得不少樂趣。</p>
+
+<blockquote>
+<p>這是使用開源軟體需要考慮的因素：開源軟體是靠社群維護的，因此較多人使用的主流平台(作業系統、資料庫等)就會支援較佳，而越少人用的平台就會地雷較多。</p>
+</blockquote>
+
+<h3 id='id52'>資料庫</h3>
+
+<p><em>Rails</em>支援的資料庫包括<em>SQLite3</em>、<em>MySQL</em>、<em>Postgres</em>、<em><a href='http://programmingzen.com/category/databases/db2/'>IBM DB2</a></em>、<em><a href='https://github.com/rsim/oracle-enhanced'>Oracle</a></em>和<em><a href='http://www.engineyard.com/blog/2011/modern-sql-server-rails/'>SQL Server</a></em>等。除了安裝資料庫軟體，我們也需要安裝搭配的<em>Ruby</em>函式庫(稱作<em>Adapter</em>或<em>Driver</em>)。作為新手的單機練習，使用<em>SQLite</em>就可以了，本章會先介紹<em>SQLite</em>的安裝方式。<a href='advanced-installation.html'>附錄</a>則會介紹如何安裝<em>MySQL</em>和<em>PostgreSQL</em>。</p>
+
+<h3 id='id53'>開發環境</h3>
+
+<h4 id='id54'>命令列視窗</h4>
+
+<p>有許多工作需要透過指令列介面<em>(Command Line Interface)</em>完成，像是安裝套件、執行<em>rails</em>指令、執行測試等等。雖然有一些<em>GUI</em>圖型介面工具可以輔助，但是到頭來你會發現還是直接在指令列輸入最快最可靠，發生問題的時候也容易除錯。</p>
+
+<p><em>Mac OS</em>下要進入命令列視窗，請打開<em>Go-&gt;Utilities</em>中的<em>Terminal</em>，或是筆者推薦可以安裝<em><a href='http://sites.google.com/site/iterm2home/'>iTerm</a></em>。<em>Ubuntu Desktop</em>下是<em>Applications-&gt;Accessories</em>下的<em>Terminal</em>。<em>Windows</em>則是「開始-&gt;附屬應用程式」中的「命令提示字元」。</p>
+
+<p><em>Unix-like</em>的指令和<em>Windows</em>的指令很多是不同的，以下是一些常用的指令：</p>
+<table><thead><tr><th>用途</th><th><em>Unix-like</em></th><th><em>Windows</em></th></tr></thead><tbody><tr><td style='text-align: left;'>移動所在目錄</td><td style='text-align: left;'>cd XXX</td><td style='text-align: left;'>cd XXX</td>
+</tr><tr><td style='text-align: left;'>移動到上一層目錄</td><td style='text-align: left;'>cd ..</td><td style='text-align: left;'>cd ..</td>
+</tr><tr><td style='text-align: left;'>顯示目前所在目錄</td><td style='text-align: left;'>pwd</td><td style='text-align: left;'>cd</td>
+</tr><tr><td style='text-align: left;'>顯示目前目錄的檔案</td><td style='text-align: left;'>ls</td><td style='text-align: left;'>dir</td>
+</tr><tr><td style='text-align: left;'>刪除檔案</td><td style='text-align: left;'>rm XXX</td><td style='text-align: left;'>erase XXX</td>
+</tr><tr><td style='text-align: left;'>刪除目錄</td><td style='text-align: left;'>rmdir XXX</td><td style='text-align: left;'>rmdir XXX</td>
+</tr><tr><td style='text-align: left;'>建立目錄</td><td style='text-align: left;'>mkdir XXX</td><td style='text-align: left;'>mkdir XXX</td>
+</tr></tbody></table>
+<p>另外，在輸入檔名或目錄名時，可以按<em>tab</em>來自動完成。</p>
+
+<h4 id='id55'>開發軟體</h4>
+
+<p>在開始寫點程式之前，讓我們先介紹一下有什麼推薦的編輯器。相較於靜態語言如<em>C++、Java</em>喜歡功能豐富的<em>IDE(Integrated Development Environment)</em>軟體，動態語言雖然也有一些<em>IDE</em>軟體，但是更多人比較偏好簡單的文字編輯器<em>(Editor)</em>加上命令列視窗就可以打遍天下。這是因為對表達能力強的動態語言來說，<em>IDE</em>提供的自動產生程式碼、編譯程式、複雜的瀏覽功能等等都不是這麼需要。</p>
+
+<h5 id='editor'><em>Editor</em>文字編輯器</h5>
+
+<ul>
+<li>Textmate <a href='http://macromates.com/'>http://macromates.com/</a> (<em>Mac OS</em>平台)</li>
+
+<li>Notepad++ <a href='http://notepad-plus-plus.org/'>http://notepad-plus-plus.org/</a> (<em>Windows</em>平台)</li>
+
+<li>Sublime Text <a href='http://www.sublimetext.com/'>http://www.sublimetext.com</a> (<em>Windows</em>、<em>Linux</em>、<em>Mac</em>平台)</li>
+
+<li>Vim <a href='http://www.vim.org/'>http://www.vim.org/</a></li>
+
+<li>Emacs <a href='http://www.gnu.org/software/emacs/'>http://www.gnu.org/software/emacs/</a></li>
+</ul>
+
+<h5 id='ide'><em>IDE</em>軟體</h5>
+
+<ul>
+<li>JetBrains RubyMine <a href='http://www.jetbrains.com/ruby/'>http://www.jetbrains.com/ruby/</a></li>
+
+<li>Aptana RedRails <a href='http://aptana.com/products/radrails'>http://aptana.com/products/radrails</a></li>
+</ul>
+
+<blockquote>
+<p>無論用什麼編輯器，請注意檔案的格式要儲存成<em>UTF-8</em>，無<em>BOM(byte-order mark)</em>表頭。</p>
+</blockquote>
+
+<h4 id='id56'>版本控制系統</h4>
+
+<p>版本控制系統可以保存所有的程式變更，記錄誰改變什麼、在什麼時候、因為什麼原因，是團隊開發不可或缺的協同工具。<em>Ruby</em>社群普遍使用<em><a href='http://git-scm.com/'>Git</a></em>這套分散式版本控制系統。雖然學習<em>Rails</em>不必要學會<em>Git</em>，但是因為<em>Rails</em>本身以及絕大部分的相關套件都是使用<em>Git</em>版本控制系統、並放在<em><a href='http://github.com'>GitHub</a></em>上。所以你最好還是安裝有<em>Git</em>並學會基本的操作。關於<em>Git</em>的介紹請參考附錄。</p>
+
+<h3 id='ruby'>安裝<em>Ruby</em>及資料庫</h3>
+
+<p>以下是分別在<em>Windows</em>、<em>Mac OSX</em>、<em>Ubuntu Desktop</em>作業系統上，安裝<em>Ruby</em>最快速方便的方式。在上手<em>Rails</em>的開發之後，可以再參考<a href='advanced-installation.html'>附錄</a>，依需求安裝不同開發環境。</p>
+
+<h4 id='windows'>Windows</h4>
+
+<p>在<em>Windows</em>上開發<em>Rails</em>最快的方式是下載<em><a href='http://railsinstaller.org/'>RailsInstaller</a></em>安裝包，這就包含了<em>Ruby 1.9.2</em>、<em>Rails 3.1</em>、<em>SQLite 3</em>、<em>Git</em>版本控制系統以及<em>SQL Server Adapter</em>。可以讓你在很短的安裝時間內就開始上手<em>Rails</em>。</p>
+
+<blockquote>
+<p>使用<em>Git</em>版本控制系統請參閱附錄。</p>
+</blockquote>
+
+<h4 id='mac_os_x'>Mac OS X</h4>
+
+<p>為了順利安裝一些需要編譯的套件，你必須先安裝<em>Xcode(Apple Developer Tools)</em>，<em>Xcode</em>在主機隨附的<em>MacOS</em>光碟片有，你也可以至<em>Apple Developer</em>官網下載最新的<em><a href='[http://developer.apple.com/technologies/xcode.html](http://developer.apple.com/technologies/xcode.html'>Xcode</a></em>。因為檔案很大，用光碟安裝會比較方便。</p>
+
+<p>接下來安裝<em><a href='http://mxcl.github.com/homebrew/'>Homebrew</a></em>來管理<em>MacOS</em>上的套件，這可以方便安裝一些常用的工具軟體，例如<em>Git</em>、<em>MySQL</em>、<em>SQLite</em>，甚至是<em>Memcached</em>、<em>Sphinx</em>、<em>Redis</em>、<em>MongoDB</em>等等都可以透過<em>Homebrew</em>安裝。本書的<em>Mac</em>安裝步驟中會使用到<em>Homebrew</em>，它的安裝步驟是執行：</p>
+
+<pre><code>$ ruby -e &quot;$(curl -fsSLk https://gist.github.com/raw/323731/install_homebrew.rb)&quot;</code></pre>
+
+<blockquote>
+<p><em>Homebrew</em>也是用<em>Ruby</em>程式語言撰寫的。另一個比較老牌的套件管理工具是<em><a href='http://www.macports.org/'>MacPort</a></em>。</p>
+</blockquote>
+
+<p><em>Snow Leopard</em>和<em>Lion</em>內建了<em>Ruby 1.8.7</em>，所以這裡透過<em>Homebrew</em>安裝新的<em>Ruby 1.9.3</em>、<em>Git</em>、<em>SQLite</em>：</p>
+
+<pre><code>$ brew install git    
+$ brew install sqlite
+$ brew install ruby</code></pre>
+
+<p>輸入以下指令加入<em>PATH</em>(不同<em>Ruby</em>版本路徑會不同，請依照裝完<em>brew install ruby</em>之後的提示)：</p>
+
+<pre><code>$ echo &#39;export PATH=/usr/local/Cellar/ruby/1.9.3-p0/bin:$PATH&#39; &gt;&gt; ~/.bash_profile
+$ export PATH=/usr/local/Cellar/ruby/1.9.3-p0/bin:$PATH</code></pre>
+
+<p>安裝完成之後輸入以下指令可以看到安裝的版本：</p>
+
+<pre><code>$ git --version
+git version 1.7.9
+$ ruby -v
+ruby 1.9.3p0 (2011-10-30 revision 33570) [x86_64-darwin11.2.0]</code></pre>
+
+<h4 id='linuxubuntu_1004_lts'>Linux<em>(Ubuntu 10.04 LTS)</em></h4>
+
+<p>首先進行<em>Linux</em>更新：</p>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade</code></pre>
+
+<p>安裝必要的套件：</p>
+
+<pre><code>$ sudo apt-get install build-essential bison openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev</code></pre>
+
+<p>接著下載<em>Ruby</em>原始碼編譯，請參考<a href='http://www.ruby-lang.org/en/downloads/'>Ruby官網</a>下載最新<em>1.9</em>版本：</p>
+
+<pre><code>$ wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p0.tar.gz
+$ tar xvfz ruby-1.9.3-p0.tar.gz
+$ cd ruby-1.9.3-p0/
+$ ./configure
+$ make
+$ sudo make install</code></pre>
+
+<p>安裝完成之後輸入以下指令可以看到安裝的版本：</p>
+
+<pre><code>$ git --version
+git version 1.7.0.4
+$ ruby -v
+ruby 1.9.3p0 (2011-10-30 revision 33570) [x86_64-linux]</code></pre>
+
+<blockquote>
+<p><em><a href='https://addons.mozilla.org/en-US/firefox/addon/sqlite-manager/'>SQLite Manager</a></em>是一套<em>Firefox plugin</em>提供 <em>SQLite</em>的<em>GUI</em>操作介面，可以用來方便檢視資料庫的內容。</p>
+</blockquote>
+
+<blockquote>
+<p>中文版<em>Ubuntu</em>的預設<em>apt-get</em>套件伺服器<em>tw.archive.ubuntu.com</em>有時候不太穩，必要時你可以修改<em>/etc/apt/sources.list</em>換成<em>debian.nctu.edu.tw</em>或<em>archive.ubuntu.com</em>。</p>
+</blockquote>
+
+<h3 id='rubygems'><em>RubyGems</em>簡介</h3>
+
+<p><em>RubyGems</em>是<em>Ruby</em>的套件管理系統，讓你輕易安裝及管理<em>Ruby</em>函式庫。你可以在<em><a href='http://rubygems.org'>RubyGems</a></em>上找到所有的<em>Ruby</em>開源套件。另外，讀者如果想找<em>Ruby</em>或<em>Rails</em>有哪些好用的套件，也可以瀏覽看看<em><a href='http://ruby-toolbox.com/'>The Ruby Toolbox</a></em>，這個站依照套件的熱門程度排序，非常方便。</p>
+
+<h4 id='id57'>常用指令</h4>
+
+<pre><code>gem -v 告訴你 RubyGems 的版本
+gem update --system 升級RubyGems的版本
+gem install gem_name 安裝某個套件
+gem list 列出安裝的套件
+gem update gem_name 更新最新版本
+gem update 更新所有你安裝的Gems
+gem install -v x.x.x gemname 安裝特定版本
+gem uninstall gem_name 反安裝</code></pre>
+
+<blockquote>
+<p>執行<code>gem install gem_name</code>的時候，它會在安裝完之後，自動產生此套件的<em>RDoc</em>和<em>ri</em>文件。不過有鑑於目前網路發達，往往直接 <em>Google</em>或是在<em><a href='http://rdoc.info'>http://rdoc.info</a></em>、<em><a href='http://api.rubyonrails.org'>http://api.rubyonrails.org</a></em>和<em><a href='http://www.ruby-doc.org/core/'>http://www.ruby-doc.org/core/</a></em>就可以查詢到文件，所以其實不太需要在本地端機器產生文件，況且安裝的時間耗時又佔硬碟空間。要省略這個步驟，有兩種方式：</p>
+</blockquote>
+
+<p>每次安裝時，加上以下參數：</p>
+
+<pre><code>$ gem install gem_name --no-ri --no-rdoc</code></pre>
+
+<p>或是新增一個<code>~/.gemrc</code>檔案內容如下，預設就不產生文件：</p>
+
+<pre><code>gem: --no-ri --no-rdoc</code></pre>
+
+<blockquote>
+<p><em>Linux</em>的使用者需要加上<em>sudo</em>，例如<code>sudo gem install gemname</code>。</p>
+</blockquote>
+
+<h3 id='ruby_on_rails'>安裝<em>Ruby on Rails</em></h3>
+
+<p>首先是<em>SQLite</em>的<em>Adapter</em>：</p>
+
+<pre><code>$ gem install sqlite3 --no-ri --no-rdoc</code></pre>
+
+<p>最後是安裝<em>Rails</em>了：</p>
+
+<pre><code>$ gem install rails --no-ri --no-rdoc</code></pre>
+
+<p>完成之後，輸入<code>rails -v</code>你應該會看到<em>Rails 3.2.1</em>。</p>
+
+<blockquote>
+<p><em>Ubuntu</em>下需要用<em>root</em>權限安裝套件：<code>sudo gem install rails</code></p>
+</blockquote>
+
+<blockquote>
+<p>為了節省安裝時間可不安裝文件檔，這裡加上<code>--no-ri</code>跟<code>--no-rdoc</code>參數。</p>
+</blockquote>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

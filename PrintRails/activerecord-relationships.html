@@ -1,0 +1,366 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | ActiveRecord 資料表關係</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/activerecord-relationships.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='activerecord_'>ActiveRecord 資料表關係</h2>
+<div id='submenu'>
+<h3>本章目錄</h3>
+<ul>
+<li>關聯 Relationship
+    <ul>
+        <li>one-to-one</li>
+        <li>one-to-many</li>
+        <li>many-to-many</li>
+        <li>共用的關聯參數</li>
+        <li>joins 和 includes 查詢</li>
+    </ul>
+</li>
+</ul>
+</div>
+<p><em>ActiveRecord</em>可以用<em>Associations</em>來定義資料表之間的關聯性，這是最被大家眼睛一亮<em>ORM</em>功能。到目前為止我們學會了用<em>ActiveRecord</em>來操作資料庫，但是還沒充分發揮關聯式資料庫的特性，那就是透過<em>primary key</em>和<em>foreign keys</em>將資料表互相關連起來。</p>
+
+<blockquote>
+<p><em>Primary Key</em>主鍵是一張資料表可以用來唯一識別的欄位，而<em>Foreign Key</em>外部鍵則是用來指向別張資料表的<em>Primary Key</em>，如此便可以產生資料表之間的關聯關係。了解如何設計正規化關聯式資料庫請參考附錄基礎。</p>
+</blockquote>
+
+<p><em>Primary Key</em>這個欄位在<em>Rails</em>中，照慣例叫做<em>id</em>，型別是整數且遞增。而<em>Foreign Key</em>欄位照慣例會叫做<code>{model_name}_id</code>，型別是整數。</p>
+
+<h3 id='onetoone'>一對一關聯<em>one-to-one</em></h3>
+
+<p><img alt='has_one diagram' src='images/activerecord-relationships-has_one_diagram.png' /></p>
+
+<p>延續<em>Part1</em>的<em>Event Model</em>範例，假設一個<em>Event</em>擁有一個<em>Location</em>。來新增一個<em>Location Model</em>，其中的<em>event_id</em>就是外部鍵欄位：</p>
+
+<pre><code>rails g model location name:string event_id:integer</code></pre>
+
+<p>執行<code>bundle exec rake db:migrate</code>產生<em>locations</em>資料表。</p>
+
+<p>分別編輯<em>app/models/event.rb</em>和<em>app/models/location.rb</em>：</p>
+
+<pre><code>class Event &lt; ActiveRecord::Base
+    has_one :location # 單數
+    #...
+end
+
+class Location &lt; ActiveRecord::Base
+    belongs_to :event # 單數
+end</code></pre>
+
+<p><em>belongs_to</em>和<em>has_one</em>這兩個方法，會分別動態新增一些方法到<em>Location</em>和<em>Event Model</em>上，讓我們進入<code>rails console</code>實際操作資料庫看看，透過<em>Associations</em>你會發現操作關聯的物件非常直覺：</p>
+
+<h4 id='locationevent'>範例一，建立<em>Location</em>物件並關聯到<em>Event</em>：</h4>
+
+<pre><code>e = Event.first
+l = Location.new( :name =&gt; &#39;Hsinchu&#39;, :event =&gt; e ) 
+# 等同於 l = Location.new( :name =&gt; &#39;Hsinchu&#39;, :event_id =&gt; e.id )
+l.save
+e.location
+l.event</code></pre>
+
+<blockquote>
+<p><code>Event.first</code>會撈出<em>events table</em>的第一筆資料，如果你第一筆還在，那就會是<code>Event.find(1)</code>。同理，<code>Event.last</code>會撈出最後一筆。</p>
+</blockquote>
+
+<h4 id='eventlocation'>範例二，從<em>Event</em>物件中建立一個<em>Location</em>：</h4>
+
+<pre><code>e = Event.first
+l = e.build_location( :name =&gt; &#39;Hsinchu&#39; )
+l.save
+e.location
+l.event</code></pre>
+
+<h4 id='eventlocation'>範例三，直接從<em>Event</em>物件中建立一個<em>Location</em>：</h4>
+
+<pre><code>e = Event.first
+l = e.create_location( :name =&gt; &#39;Hsinchu&#39; )
+e.location
+l.event</code></pre>
+
+<h3 id='onetomany'>一對多關聯<em>one-to-many</em></h3>
+
+<p><img alt='has_one diagram' src='images/activerecord-relationships-has_many_diagram.png' /></p>
+
+<p>一對多關聯算是最常用的，例如一個<em>Event</em>擁有很多<em>Attendee</em>，來新增<em>Attendee Model</em>：</p>
+
+<pre><code>rails g model attendee name:string event_id:integer</code></pre>
+
+<p>執行<code>bundle exec rake db:migrate</code>產生<em>attendees</em>資料表。</p>
+
+<p>分別編輯<em>app/models/event.rb</em>和<em>app/models/attendee.rb</em>：</p>
+
+<pre><code>class Event &lt; ActiveRecord::Base
+    has_many :attendees # 複數
+    #...
+end
+
+class Attendee &lt; ActiveRecord::Base
+    belongs_to :event # 單數
+end</code></pre>
+
+<p>同樣地，<em>belongs_to</em>和<em>has_many</em>這兩個方法，會分別動態新增一些方法到<em>Attendee</em>和<em>Event Model</em>上，讓我們進入<code>rails console</code>實際操作資料庫看看：</p>
+
+<h4 id='attendeeevent'>範例一，建立<em>Attendee</em>物件並關聯到<em>Event</em>:</h4>
+
+<pre><code>e = Event.first
+a = Attendee.new( :name =&gt; &#39;ihower&#39;, :event =&gt; e ) 
+# 或 a = Attendee.new( :name =&gt; &#39;ihower&#39;, :event_id =&gt; e.id )
+a.save
+e.attendees # 這是陣列
+e.attendees.size
+Attendee.first.event</code></pre>
+
+<h4 id='eventattendee'>範例二，從<em>Event</em>物件中建立一個<em>Attendee</em>:</h4>
+
+<pre><code>e = Event.first
+a = e.attendees.build( :name =&gt; &#39;ihower&#39; )
+a.save
+e.attendees</code></pre>
+
+<h4 id='eventattendee'>範例三，直接從<em>Event</em>物件中建立一個<em>Attendee</em>:</h4>
+
+<pre><code>e = Event.first
+a = e.attendees.create( :name =&gt; &#39;ihower&#39;, :event =&gt; e )
+e.attendees</code></pre>
+
+<h4 id='attendeeevent'>範例四，先建立<em>Attendee</em>物件再放到<em>Event</em>中:</h4>
+
+<pre><code>e = Event.first
+a = Attendee.create( :name =&gt; &#39;ihower&#39; )
+e.attendees &lt;&lt; a
+e.attendees</code></pre>
+
+<h4 id='eventattendee'>範例五，根據特定的<em>Event</em>查詢<em>Attendee</em></h4>
+
+<pre><code>e = Event.first
+e.id # 1
+a = e.attendees.find(3)
+attendees = e.attendees.where( :name =&gt; &#39;ihower&#39; )</code></pre>
+
+<p>這樣就可以寫出限定在某個<em>Event</em>下的條件查詢，用這種寫法可以避免一些安全性問題，不會讓沒有權限的使用者搜尋到別的<em>Event</em>的<em>Attendee</em>。</p>
+
+<h4 id='id104'>範例六，刪除</h4>
+
+<pre><code>Event.attendees.destroy_all # 會一筆筆觸發Attendee的destroy回呼
+Event.attendees.delete_all # 不會觸發Attendee的destroy回呼</code></pre>
+
+<blockquote>
+<p>有個口訣可以記起來：有<em>Foreign Key</em>的<em>Model</em>，就是設定<code>belongs_to</code>的Model。</p>
+</blockquote>
+
+<p>學到這裡，還記得上一章建立的<code>Category</code>嗎? 它也要跟<code>Event</code>是一對多的關係，讓我們補上程式吧：</p>
+
+<pre><code>class Category &lt; ActiveRecord::Base
+    has_many :events
+end
+
+class Event &lt; ActiveRecord::Base
+  belongs_to :category
+  # ...
+end</code></pre>
+
+<h3 id='manytomany'>多對多關聯<em>many-to-many</em></h3>
+
+<p><img alt='has_one diagram' src='images/activerecord-relationships-many_to_many_1_diagram.png' /></p>
+
+<p><img alt='has_one diagram' src='images/activerecord-relationships-many_to_many_2_diagram.png' /></p>
+
+<p>另一種常見的關聯模式則是多對多，一筆資料互相擁有多筆資料，例如一個<em>Event</em>有多個<em>Group</em>，一個<em>Group</em>有多個<em>Event</em>。多對多關聯的實作必須多一個額外關聯用的資料表(又做作<em>Join table</em>)，讓我們來建立<em>Group Model</em>和關聯用的<em>EventGroupship Model</em>，其中後者定義了兩個<em>Foreign Keys</em>：</p>
+
+<pre><code>rails g model group name:string
+rails g model event_groupship event_id:integer group_id:integer</code></pre>
+
+<p>執行<code>bundle exec rake db:migrate</code>產生這兩個資料表。</p>
+
+<p>分別編輯<em>app/models/event.rb</em>、<em>app/models/group.rb</em>和<em>app/models/event_groupship.rb</em>：</p>
+
+<pre><code>class Event &lt; ActiveRecord::Base
+    has_many :event_groupships
+    has_many :groups, :through =&gt; :event_groupships
+end
+
+class EventGroupship &lt; ActiveRecord::Base
+    belongs_to :event
+    belongs_to :group
+end
+
+class Group &lt; ActiveRecord::Base
+    has_many :event_groupships
+    has_many :events, :through =&gt; :event_groupships
+end</code></pre>
+
+<blockquote>
+<p>這個<em>Join table</em>筆者的命名習慣會是<em>ship</em>結尾，用以凸顯它的關聯性質。另外，除了定義<em>Foreign Keys</em>之外，你也可以自由定義一些額外的欄位，例如記錄是哪位使用者建立關聯。</p>
+</blockquote>
+
+<p><em>blongs_to</em>和<em>has_many</em>我們見過了，這裡多一種<em>has_many :through</em>方法，可以神奇地把<em>Event</em>和<em>Group</em>關聯起來，讓我們進入<code>rails console</code>實際操作資料庫看看：</p>
+
+<h4 id='id105'>範例，建立雙向關聯記錄:</h4>
+
+<pre><code>g = Group.create( :name =&gt; &#39;ruby taiwan&#39; )
+e1 = Event.first
+e2 = Event.create( :name =&gt; &#39;ruby tuesday&#39; )
+EventGroupship.create( :event =&gt; e1, :group =&gt; g )
+EventGroupship.create( :event =&gt; e2, :group =&gt; g )
+g.events
+e1.groups
+e2.groups</code></pre>
+
+<blockquote>
+<p><em>Rails</em>還有一種舊式的<em>has_and_belongs_to_many</em>方法也可以建立多對多關係，不過已經很少使用，在此略過不提。</p>
+</blockquote>
+
+<h3 id='id106'>關連的參數</h3>
+
+<p>以上的關聯方法<em>blongs_to</em>、<em>has_one</em>和<em>has_many</em>都還有一些可以客製的參數，讓我們來介紹幾個常用的參數，完整的參數請查詢<em>API</em>文件：</p>
+
+<h4 id='class_name'>class_name</h4>
+
+<p>可以變更關聯的類別名稱，例如：</p>
+
+<pre><code>class Event &lt; ActiveRecord::Base
+    belongs_to :manager, :class_name =&gt; &quot;User&quot; # 外部鍵是user_id
+end</code></pre>
+
+<h4 id='foreign_key'>foreign_key</h4>
+
+<p>可以變更<em>Foreign Key</em>的欄位名稱，例如改成<code>manager_id</code>：</p>
+
+<pre><code>class Event &lt; ActiveRecord::Base
+    belongs_to :manager, :class_name =&gt; &quot;User&quot;, :foreign_key =&gt; &quot;manager_id&quot;
+end</code></pre>
+
+<h4 id='order'>order</h4>
+
+<p><code>has_many</code>可以透過<code>:order</code>參數指定順序：</p>
+
+<pre><code>class Event &lt; ActiveRecord::Base
+    has_many :attendees, :order =&gt; &quot;id desc&quot;
+    #...
+end</code></pre>
+
+<h4 id='dependent'>dependent</h4>
+
+<p>可以設定當物件刪除時，也會順便刪除它的<code>has_many</code>物件：</p>
+
+<pre><code>class Event &lt; ActiveRecord::Base
+    has_many :attendees, :dependent =&gt; :destroy
+ end</code></pre>
+
+<p><code>:dependent</code>可以有三種不同的刪除方式，分別是：</p>
+
+<ul>
+<li><code>:destroy</code> 會執行<em>attendee</em>的<em>destroy</em>回呼</li>
+
+<li><code>:delete</code> 不會執行<em>attendee</em>的<em>destroy</em>回呼</li>
+
+<li><code>:nullify</code> 這是預設值，不會幫忙刪除<em>attendee</em></li>
+</ul>
+
+<blockquote>
+<p>要不要執行<em>attendee</em>的刪除回呼效率相差不少，如果需要的話，必須一筆筆把<em>attendee</em>讀取出來變成<em>attendee</em>物件，然後呼叫它的<em>destroy</em>。如果用<code>:delete</code>的話，只需要一個<em>SQL</em>語句就可以刪除全部<em>attendee</em>。</p>
+</blockquote>
+
+<h3 id='joins__includes_'>joins 和 includes 查詢</h3>
+
+<p>針對<em>Model</em>中的<code>belongs_to</code>和<code>has_many</code>關連，可以使用<code>joins</code>，也就是<em>INNER JOIN</em></p>
+
+<pre><code>Event.joins(:category)
+# SELECT &quot;events&quot;.* FROM &quot;events&quot; INNER JOIN &quot;categories&quot; ON &quot;categories&quot;.&quot;id&quot; = &quot;events&quot;.&quot;category_id&quot;</code></pre>
+
+<p>可以一次關連多個：</p>
+
+<pre><code> Event.joins(:category, :location)</code></pre>
+
+<p><em>joins</em>主要的用途是來搭配<em>where</em>的條件查詢：</p>
+
+<pre><code>Event.joins(:category).where(&quot;categories.name is NOT NULL&quot;)
+# SELECT &quot;events&quot;.* FROM &quot;events&quot; INNER JOIN &quot;categories&quot; ON &quot;categories&quot;.&quot;id&quot; = &quot;events&quot;.&quot;category_id&quot; WHERE (categories.name is NOT NULL)</code></pre>
+
+<p>透過<em>joins</em>抓出來的<em>event</em>物件是沒有包括其關連物件的。如果需要其關連物件的資料，會使用<code>includes</code>。<em>includes</em>可以預先將關連物件的資料也讀取出來，避免<em>N+1</em>問題(見效能一章)</p>
+
+<pre><code>Event.includes(:category)
+# SELECT * FROM events
+# SELECT * FROM categories WHERE categories.id IN (1,2,3...)</code></pre>
+
+<p>同理，也可以一次載入多個關連：</p>
+
+<pre><code>Event.includes(:category, :attendees)
+# SELECT &quot;events&quot;.* FROM &quot;events&quot; 
+# SELECT &quot;categories&quot;.* FROM &quot;categories&quot; WHERE &quot;categories&quot;.&quot;id&quot; IN (1,2,3...)
+# SELECT &quot;attendees&quot;.* FROM &quot;attendees&quot; WHERE &quot;attendees&quot;.&quot;event_id&quot; IN (4, 5, 6, 7, 8...)</code></pre>
+
+<p><code>includes</code>方法也可以加上條件：</p>
+
+<pre><code>Event.includes(:category).where( :category =&gt; { :position =&gt; 1 } )</code></pre>
+
+<h3 id='id107'>更多線上資源</h3>
+
+<ul>
+<li>A Guide to Active Record Associations <a href='http://guides.rubyonrails.org/association_basics.html'>http://guides.rubyonrails.org/association_basics.html</a></li>
+</ul>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 

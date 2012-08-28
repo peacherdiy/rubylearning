@@ -1,0 +1,288 @@
+<!DOCTYPE html> 
+<html> 
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type" /> 
+		<title>Ruby on Rails 實戰聖經 | Routing 路由</title>
+        <meta name="keywords" content="Rails, RoR, Ruby on Rails, Ruby, Rails3, Rails 3, ihower, 教育訓練, 教學, 教材, 文件, 講義"> 
+		<link rel="stylesheet" type="text/css" href="http://cdn.ihower.tw/rails3/style.css?201105161715">
+		<!--<link rel="stylesheet" type="text/css" href=""http://cdn.ihower.tw/rails3/syntax.css?201105161715">-->
+		<link rel="canonical" href="http://ihower.tw/rails3/routing.html" />
+		<script src="http://code.jquery.com/jquery-1.6.1.min.js" type="text/javascript"></script>
+	    <script type="text/javascript">	            
+	    $(document).ready(function() {	        
+            $('.sidebar').append( $("#submenu") );
+            $('#submenu').show(); 
+        });
+	   </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-145330-11']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+	</head> 
+<body>
+<div class="container">
+    <div class="page_header">
+        <h1 class="logo"><a href="./index.html">Ruby on Rails 實戰聖經<span>使用 Rails 3.2 及 Ruby 1.9.3</span></a></h1>
+        <div class="search_box">
+            <form class="search" action="http://www.google.com/search">
+            <input type="hidden" value="ihower.tw/rails3" name="as_sitesearch">
+            <input class="search_field" type="text" value="" name="as_q">
+            <input class="search_btn" type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="notice">
+    <p class="inner info_bubble">
+        本書尚未完成，如果您有任何意見、鼓勵或勘誤，歡迎<a href="mailto:ihower@gmail.com">來信給我</a>，謝謝。
+    </p>
+    </div>
+
+    <div class="inner wrap">
+       <div class="sidebar">
+            <h3><a href="index.html">回首頁</a></h3>
+       </div>
+       <div class="content body">
+	   <h2 id='routing_'>Routing 路由</h2>
+<div id='submenu'>
+<h3>本章目錄</h3>
+<ul>
+<li>典型路由</li>
+<li>一般路徑 Regular Routes</li>
+<li>命名路由 Named Routes</li>
+<li>設定首頁</li>
+<li>HTTP 動詞(Verb)限定 Routes</li>
+<li>特殊限定路徑 The Constraints Method</li>
+<li>RESTful
+    <ul>
+        <li>套疊(Nested) Resources</li>
+        <li>自定群集動作 Collection</li>
+        <li>自定特定元素動作 Member</li>
+        <li>單數資源 Singular Resoruce</li>
+        <li>領域名稱 Namespace</li>
+    </ul>
+</li>
+<li>rake routes</li>
+</ul>
+</div>
+<p>不同於<em>PHP</em>的路由系統是直接對應於檔案的目錄結構，一個<em>Web</em>開發框架會將路由功能納入其中，來獲得最大的彈性。也就是您可以指定任意<em>URL</em>對應到任一個<em>Controller</em>的<em>Action</em>。另一方面，我們也不在<em>Views</em>中直接寫死<em>URL</em>網址，而是透過<em>Helper</em>輔助方法根據你的路由設定來產生<em>URL</em>。</p>
+
+<p>也就是，路由系統做幾件事情：</p>
+
+<p>1. 辨識<em>HTTP Request</em>的<em>URL</em>網址，然後對應到設定的<em>Controller Action</em>。</p>
+
+<p>2. 處理網址內的參數字串，例如：<em>/users/show/123</em>送到<em>Users controller</em>的<em>show action</em>時，會將<code>params[:id]</code> 設定為 123</p>
+
+<p>3. 辨識<em>link_to</em>和<em>redirect_to</em>的參數產生<em>URL</em>字串，例如</p>
+
+<pre><code>link_to &#39;hola!&#39;, { :controller=&gt; &#39;welcome&#39;, :action =&gt; &#39;say&#39; }</code></pre>
+
+<p>會產生</p>
+
+<pre><code>&lt;a href=&quot;/welcome/say&quot;&gt;hola!&lt;/a&gt;</code></pre>
+
+<p><em>Rails</em>這麼彈性的路由功能，可以怎麼用呢？例如設計一個部落格網站，如果是沒有框架的<em>PHP</em>網頁開發，會長得這樣：</p>
+
+<pre><code>http://example.org/?p=123</code></pre>
+
+<p>但是如果我們想要將編號放在網址列中呢?</p>
+
+<pre><code>http://example.org/posts/123</code></pre>
+
+<p>或是希望根據日期：</p>
+
+<pre><code>http://example.org/posts/2011/04/21/</code></pre>
+
+<p>或者是根據不同作者加上文章的標籤(將關鍵字放在網址中有助於<em>SEO</em>)：</p>
+
+<pre><code>http://example.org/ihower/posts/123-ruby-on-rails</code></pre>
+
+<p>這些在<em>Rails</em>只需要修改<em>config/routes.rb</em>這一個路由檔案，就可以完全自由自定。讓我們看看有哪些設定方式吧：</p>
+
+<h3 id='id174'>典型路由</h3>
+
+<pre><code>match &#39;/:controller(/:action(/:id))(.format)&#39;</code></pre>
+
+<p>這是我們在上一章所使用的方式，也是<em>Rails 3.0</em>之前版本的預設方式。其中的括弧用法表示可有可無，也就是上述這一行設定就包括六種路徑方式：</p>
+
+<pre><code>match &#39;/:controller&#39;
+match &#39;/:controller/:action&#39;
+match &#39;/:controller/:action/:id&#39;
+match &#39;/:controller.:format&#39;
+match &#39;/:controller/:action.:format&#39;
+match &#39;/:controller/:action/:id.:format&#39;</code></pre>
+
+<p>例如，像這樣的網址<code>http://localhost:3000/welcome/say</code>便會對應到<em>welcome controller</em>的<em>say action</em>。典型路由是一種非常簡便的對應方式。這種方式的缺點當網站的<em>Action</em>變多的時候，會容易讓<em>Controller</em>的設計變得混亂沒有規則。稍後介紹的<em>RESTful</em>路由則是<em>Rails</em>對此提出的組織路由方案。</p>
+
+<h3 id='regular_routes'>一般路徑<em>Regular Routes</em></h3>
+
+<pre><code>match &#39;meetings/:id&#39;, :to =&gt; &#39;events#show&#39;</code></pre>
+
+<p>這裡的<code>events#show</code>表示指向<em>events controller</em>的<em>show action</em>。通常會簡寫成：</p>
+
+<pre><code>match &#39;meetings/:id&#39; =&gt; &#39;events#show&#39;</code></pre>
+
+<blockquote>
+<p>注意到在<em>routes.rb</em>中，越上面越優先。是如果有網址同時符合多個規則，會使用最上面的規則。</p>
+</blockquote>
+
+<h3 id='named_routes'>命名路由<em>Named Routes</em></h3>
+
+<p><em>Named Routes</em>可以幫助我們產生<em>URL helper</em>如<code>meetings_url</code>或<code>meetings_path</code>，而不需要用<code>{:controller =&gt; &#39;meetings&#39;, :action =&gt; &#39;index&#39;}</code>的方式：</p>
+
+<pre><code>match &#39;/meetings&#39; =&gt; &#39;events#index&#39;, :as =&gt; &quot;meetings&quot;</code></pre>
+
+<p>其中<code>:as</code>的部份就會產生一個<code>meetings_path</code>和<code>meetings_url</code>的<em>Helpers</em>，<code>_path</code>和<code>_url</code>的差別在於前者是相對路徑，後者是絕對路徑。一般來說比較常用<code>_path</code>方法，除非像是在<em>Email</em>信件中，才必須用<code>_url</code>提供包含<em>Domain</em>的完整網址。</p>
+
+<blockquote>
+<p>雖然<em>RESTful</em>已經是設計<em>Rails</em>最常見的路徑模式，但是在一些特殊的情況、不符合<em>CRUD</em>模型的情結就不一定適用了，例如有多重步驟的表單(又叫作<em>Wizard</em>) 時，使用命名路由反而會比較簡潔，例如<code>step1_path, step2_path, step3_path</code>等。</p>
+</blockquote>
+
+<h3 id='id175'>設定首頁</h3>
+
+<p>要設定網站的首頁，請設定：</p>
+
+<pre><code>root :to =&gt; &#39;welcome#show&#39;</code></pre>
+
+<p>記得也要刪除<em>public/index.html</em>這個檔案</p>
+
+<h3 id='httpverb'><em>HTTP</em>動詞<em>(Verb)</em>限定</h3>
+
+<p>可以透過 :via 參數指定 HTTP Verb 動詞</p>
+
+<pre><code>match &quot;account/overview&quot; =&gt; &quot;account#overview&quot;, :via =&gt; &quot;get&quot;
+match &quot;account/setup&quot; =&gt; &quot;account#setup&quot;, :via =&gt; [:get, :post]</code></pre>
+
+<p>或是</p>
+
+<pre><code>get &quot;account/overview&quot; =&gt; &quot;account#overview&quot;
+get &quot;account/setup&quot; =&gt; &quot;account#setup&quot;
+post &quot;account/setup&quot; =&gt; &quot;account#setup&quot;</code></pre>
+
+<h3 id='id176'>特殊條件限定</h3>
+
+<p>我們可以利用<code>:constraints</code>設定一些參數限制，例如限制<code>:id</code>必須是整數。</p>
+
+<pre><code>match &quot;/events/show/:id&quot; =&gt; &quot;events#show&quot;, :constraints =&gt; {:id =&gt; /\d/}</code></pre>
+
+<p>另外也可以限定<em>IP</em>位置：</p>
+
+<pre><code>constraints(:ip =&gt; /(^127.0.0.1$)|(^192.168.[0-9]{1,3}.[0-9]{1,3}$)/) do
+    match &quot;/events/show/:id&quot; =&gt; &quot;events#show&quot;
+end</code></pre>
+
+<h3 id='restful'><em>RESTful</em>路由</h3>
+
+<p>我們在第六章介紹過<em>RESTful</em>路由的來龍去脈，接下來仔細看看其中的設定。</p>
+
+<h4 id='id177'>複數資源</h4>
+
+<pre><code>resources :events</code></pre>
+
+<h4 id='singular_resoruce'>單數資源<em>Singular Resoruce</em></h4>
+
+<p>除了一般複數型<em>Resources</em>，在單數的使用情境下也可以設定成單數<em>Resource</em>：</p>
+
+<pre><code>resource :map</code></pre>
+
+<p>特別之處在於那就沒有<em>index action</em>了，所有的<em>URL Helper</em>也皆為單數形式，顯示出來的網址也是單數。</p>
+
+<blockquote>
+<p>但是<em>Singular resource</em>的檔案命名仍為複數，例如<em>maps_controller.rb</em></p>
+</blockquote>
+
+<h4 id='nested_resources'>套疊<em>Nested Resources</em></h4>
+
+<p>當一個<em>Resource</em>一定會依存另一個<em>Resource</em>時，我們可以套疊多層的<em>Resources</em>，例如以下是任務一定屬於在專案底下：</p>
+
+<pre><code>resources :projects do
+  resources :tasks, :people
+end</code></pre>
+
+<p>如此產生的<em>URL Helper</em>如<code>project_tasks_path(@project)</code>和<code>project_task_path(@project, @task)</code>，它的網址會如<em>projects/123/tasks</em>和<em>projects/123/tasks/123</em>。</p>
+
+<blockquote>
+<p>實務上不建議設計超過兩層</p>
+</blockquote>
+
+<h4 id='collection'>自定群集路由<em>Collection</em></h4>
+
+<p>除了慣例中的七個<em>Actions</em>外，如果你需要自定群集的<em>Action</em>，可以這樣設定：</p>
+
+<pre><code>resources :products do
+  collection do
+    get  :sold
+    post :on_offer
+  end
+end</code></pre>
+
+<p>如此便會有<code>sold_products_path</code>和<code>on_offer_products_path</code>這兩個<em>URL Helper</em>，產生出如<em>products/sold</em>和<em>products/on_offer</em>這樣的網址。</p>
+
+<h4 id='member'>自定特定元素路由<em>Member</em></h4>
+
+<p>如果需要自定對特定元素的<em>Action</em>：</p>
+
+<pre><code>resources :products do
+  get :sold, :on =&gt; :member
+end</code></pre>
+
+<p>如此會有<code>sold_product_path(@product)</code>這個<em>URL Helper</em>，產生出如<em>products/123/sold</em>這樣的網址。</p>
+
+<h3 id='namespace'>領域名稱<em>Namespace</em></h3>
+
+<p>我們可以在<em>URL</em>網址前多加一段，特別適合例如後台介面：</p>
+
+<pre><code>namespace :admin do
+  resources :projects
+end</code></pre>
+
+<p>如此原先的<em>URL Helper</em>就會變成如<code>admin_projects_path</code>這樣的形式。</p>
+
+<p>如果您對這些進階的設定不知道如何用起，沒關係我們在進階<em>RESTful</em>一章將提供完整的程式範例。</p>
+
+<h3 id='rake_routes'>rake routes</h3>
+
+<p>如果你不清楚這些路由設定到底最後的規則是什麼，你可以執行：</p>
+
+<pre><code>rake routes</code></pre>
+
+<p>這樣就會產生出所有<em>URL Helper</em>、<em>URL 網址</em>和對應的<em>Controller Action</em>都列出來。</p>
+
+<h3 id='id178'>結論</h3>
+
+<p>透過<em>RESTful</em>和<em>Named Route</em>，我們就不再需要透過典型路由的<em>Hash</em>來指定路由了。所有的路由規則都可以在<em>routes.rb</em>一目了然。</p>
+
+<h3 id='id179'>線上參考資料</h3>
+
+<ul>
+<li><a href='http://guides.rubyonrails.org/routing.html'>http://guides.rubyonrails.org/routing.html</a></li>
+
+<li><a href='http://www.engineyard.com/blog/2010/the-lowdown-on-routes-in-rails-3/'>http://www.engineyard.com/blog/2010/the-lowdown-on-routes-in-rails-3/</a></li>
+
+<li><a href='http://www.railsdispatch.com/posts/rails-routing'>http://www.railsdispatch.com/posts/rails-routing</a></li>
+</ul>
+	   </div>
+	</div>
+</div>
+
+
+<div class="footer">
+<div class="container">
+<p>
+<a href="http://ihower.tw/rails3/">Ruby on Rails 實戰聖經</a> | Copyright©2011 <a href="http://ihower.tw/blog/">Wen-Tien Chang</a>. All Rights Reserved.<br>
+除投影片使用<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 授權</a>釋出，文字及圖片等內容保留所有權利。<br>
+本網頁樣式來自 <a href="http://guide.couchdb.org/">CouchDB: The Definitive Guide</a>。
+</p>
+</div>
+</div>
+</body> 
+</html> 
