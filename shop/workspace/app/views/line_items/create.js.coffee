@@ -1,1 +1,2 @@
-page.replace_html('cart', render(@cart))
+#page.replace_html('cart', render(@cart))
+$("#cart").html("<%= j render(@cart) %>")
