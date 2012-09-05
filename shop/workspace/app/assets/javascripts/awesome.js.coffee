@@ -1,2 +1,2 @@
-square = (x) -> x * x
-alert square(10)
+#square = (x) -> x * x
+#alert square(10)

@@ -48,7 +48,9 @@ class LineItemsController < ApplicationController
     respond_to do |format|
       if @line_item.save
         format.html { redirect_to("/store/index") }
-        format.js
+        format.js if request.xhr? do
+          @current_item = @line_item
+        end
         format.xml  { render :xml => @line_item,
                              :status => :created, :location => @line_item }
       else
