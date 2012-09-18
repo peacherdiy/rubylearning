@@ -7,6 +7,14 @@ Demo::Application.routes.draw do
 
   get "sessions/destroy"
 
+  get "admin/index"
+
+  get "sessions/new"
+
+  get "sessions/create"
+
+  get "sessions/destroy"
+
   resources :users
 
   resources :orders
@@ -82,6 +90,14 @@ Demo::Application.routes.draw do
 end
 
 Demo::Application.routes.draw do
+  get "admin/index"
+
+  get "sessions/new"
+
+  get "sessions/create"
+
+  get "sessions/destroy"
+
   get 'admin' => 'admin#index'
 
   controller :sessions do
